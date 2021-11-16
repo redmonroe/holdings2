@@ -72,6 +72,7 @@ def price_updater(filename=None):
 
         for count, row in enumerate(csvReader, 1):
             item = LBName()
+            # print(row)
             item.name = row['\ufeffname']
             try:                
                 price = yf.download(item.name, period='1y', interval='1wk')
@@ -454,6 +455,17 @@ def update_prices_mj():
 
 @cli.command()
 @timer
+def update_prices_retail():
+    click.echo('updating xrt prices')
+
+    init_table(t_name='lb_name')
+
+    csv_file='index_components/retail_xrt.csv'
+    price_updater(filename=csv_file)
+
+
+@cli.command()
+@timer
 def update_prices_pm():
     click.echo('updating precious metals (GDX) prices')
 
@@ -549,6 +561,7 @@ cli.add_command(update_prices_pm)
 cli.add_command(update_prices_soxx)
 cli.add_command(update_prices_homies)
 cli.add_command(update_prices_mj)
+cli.add_command(update_prices_retail)
 cli.add_command(visualize)
 
 if __name__ == '__main__':

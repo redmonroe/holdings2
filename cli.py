@@ -15,14 +15,17 @@ ROWS = 500
 DATABASE_URL_HISTORICAL_DATASET = 'postgresql://postgres:postgres@localhost:5432/historical_prices'
 SPY_HOLDINGS_CSV = 'index_components/holdings-daily-us-en-spy_10302021.csv'
 
+#single etf scanner globas
+OUTPUT_FOR_CHART_FILE='PRACTICE_WORKING_FILE_WITH_CHART.xlsx'
+
 def str_to_list_helper(str):
     str = str[1:]
     str = str[:-1]
     list = str.split(",")
     return list
 
-def unpack_lod(list_of_dicts):
     id_list = []
+def unpack_lod(list_of_dicts):
     tag_list = []
     for item in list_of_dicts:
         for k, v in item.items():
@@ -65,6 +68,17 @@ def init_table(t_name=None):
     
     db.create_all()
 
+def price_writer(filename=None):
+    # query = LBN
+    df = pd.read_sql_table('lb_name', con=db.engine )
+
+    # with pd.ExcelWriter(filename, mode='a') as writer:
+    #     df.to_excel(writer, sheet_name='another sheet', index=False)
+
+
+
+    # df.to_excel(filename, columns=['id', 'name', 'gain_factor', 'off_hi'], index=False)
+
 def price_updater(filename=None):
     with open(filename, encoding='utf-8') as csvf: 
         #load csv file data using csv library's dictionary reader
@@ -72,7 +86,7 @@ def price_updater(filename=None):
 
         for count, row in enumerate(csvReader, 1):
             item = LBName()
-            print(row)
+            # print(row)
             try:
                 item.name = row['\ufeffname']
             except KeyError as e:
@@ -97,8 +111,6 @@ def price_updater(filename=None):
                 print(e, f'unable download ticker {item.name}')
 
     db.session.close()
-
-
 
 @click.group()
 def cli():
@@ -129,8 +141,6 @@ def database_test():
     # print(inspector.has_table(LBName.name))
     # print(db)
     # db.drop_all()
-
-
 
     # result = LBName.query.all()
     for count, item in enumerate(LBName.query.all(), 1):
@@ -403,11 +413,7 @@ def topdown_explore():
 def update_prices_ll():
     click.echo('updating leaders & laggard prices')
     
-    table_names = inspect(db.engine).get_table_names()
-    if 'lb_name' in table_names:
-        LBName.__table__.drop(db.engine)
-    
-    db.create_all()
+    init_table(t_name='lb_name')  
     
     csv_file='LBOARD_BROAD_ASSET_CLASS_1121.csv'
     price_updater(filename=csv_file)
@@ -417,14 +423,12 @@ def update_prices_ll():
 def update_prices_fang():
     click.echo('updating MEGACAP TECH prices')
     
-    table_names = inspect(db.engine).get_table_names()
-    if 'lb_name' in table_names:
-        LBName.__table__.drop(db.engine)
-    
-    db.create_all()
+    init_table(t_name='lb_name')
 
     csv_file='index_components/fang_names.csv'
     price_updater(filename=csv_file)
+
+    price_writer(filename=OUTPUT_FOR_CHART_FILE)
 
 @cli.command()
 @timer
@@ -476,6 +480,17 @@ def update_prices_kweb():
 
     csv_file='index_components/kweb.csv'
     price_updater(filename=csv_file)
+
+@cli.command()
+@timer
+def update_prices_igv():
+    click.echo('updating software prices')
+
+    init_table(t_name='lb_name')
+
+    csv_file='index_components/igv.csv'
+    price_updater(filename=csv_file)
+
 
 
 @cli.command()
@@ -576,6 +591,7 @@ cli.add_command(update_prices_soxx)
 cli.add_command(update_prices_homies)
 cli.add_command(update_prices_mj)
 cli.add_command(update_prices_retail)
+cli.add_command(update_prices_kweb)
 cli.add_command(visualize)
 
 if __name__ == '__main__':

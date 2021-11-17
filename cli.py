@@ -72,8 +72,12 @@ def price_updater(filename=None):
 
         for count, row in enumerate(csvReader, 1):
             item = LBName()
-            # print(row)
-            item.name = row['\ufeffname']
+            print(row)
+            try:
+                item.name = row['\ufeffname']
+            except KeyError as e:
+                print(f'ufeff_error: {e}, will attempt to try row[name]')
+                item.name = row['name']
             try:                
                 price = yf.download(item.name, period='1y', interval='1wk')
                 current_price = price['Close'].tail(1).item()
@@ -461,6 +465,16 @@ def update_prices_retail():
     init_table(t_name='lb_name')
 
     csv_file='index_components/retail_xrt.csv'
+    price_updater(filename=csv_file)
+
+@cli.command()
+@timer
+def update_prices_kweb():
+    click.echo('updating kweb prices')
+
+    init_table(t_name='lb_name')
+
+    csv_file='index_components/kweb.csv'
     price_updater(filename=csv_file)
 
 

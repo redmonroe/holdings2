@@ -76,6 +76,8 @@ class Address(db.Model):
 '''
 
 
-@app.route("/")
+@app.route("/scatterplot")
 def hello_world():
-    return "<p>Hello, World!</p>"
+    result = LBName.query.all()
+
+    return jsonify(result)

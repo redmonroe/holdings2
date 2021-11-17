@@ -75,8 +75,6 @@ def price_writer(filename=None):
     # with pd.ExcelWriter(filename, mode='a') as writer:
     #     df.to_excel(writer, sheet_name='another sheet', index=False)
 
-
-
     # df.to_excel(filename, columns=['id', 'name', 'gain_factor', 'off_hi'], index=False)
 
 def price_updater(filename=None):
@@ -427,8 +425,6 @@ def update_prices_fang():
 
     csv_file='index_components/fang_names.csv'
     price_updater(filename=csv_file)
-
-    price_writer(filename=OUTPUT_FOR_CHART_FILE)
 
 @cli.command()
 @timer

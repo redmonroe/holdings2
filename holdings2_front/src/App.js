@@ -5,7 +5,7 @@ import ScatterPlot from "./components/ScatterPlot";
 
 const App = () => {
   // Sample data
-  return <ScatterPlot> </ScatterPlot>;
+  return <ScatterPlot></ScatterPlot>;
 };
 
 export default App;

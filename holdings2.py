@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import os
-from flask import Flask
+from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from config import Config
@@ -74,10 +74,17 @@ class Address(db.Model):
     person_id = db.Column(db.Integer, db.ForeignKey('person.id'),
         nullable=False)
 '''
+@app.get('/')
+def home():
+    return 'hello_world'
 
-
-@app.route("/scatterplot")
-def hello_world():
-    result = LBName.query.all()
+@app.get("/scatterplot")
+def scatterplot():
+    # result = LBName.query.all()
+    result = {
+        'x': '1', 
+        'y': '10'
+    }
+    print(result)
 
     return jsonify(result)

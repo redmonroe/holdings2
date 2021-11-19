@@ -81,10 +81,7 @@ def home():
 @app.get("/scatterplot")
 def scatterplot():
     # result = LBName.query.all()
-    result = {
-        'x': '1', 
-        'y': '10'
-    }
+    result = 'hi'
     print(result)
 
     return jsonify(result)

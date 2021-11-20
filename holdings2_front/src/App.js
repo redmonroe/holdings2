@@ -1,9 +1,9 @@
 import React, { Fragment } from "react";
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
-import ScatterPlot from "./components/ScatterPlot";
 
 import HoldIndex from "./pages/HoldIndex";
+import PlotA from "./pages/PlotA";
 // import ScatterPlot from "./components/ScatterPlot";
 
 const App = () => {
@@ -11,9 +11,10 @@ const App = () => {
   return (
     <div>
       <Fragment>
-        {/* <HoldIndex></HoldIndex> */}
         <Routes>
           <Route path='/' exact element={<HoldIndex />} />
+          <Route path='/plota' element={<PlotA />} />
+          <Route path='/holdindex' element={<HoldIndex />} />
         </Routes>
       </Fragment>
     </div>

@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import dataset
 import os
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -77,6 +78,22 @@ class Address(db.Model):
 @app.get('/')
 def home():
     return 'hello_world'
+
+@app.get('/holdindex')
+def holdindex():
+
+    from sqlalchemy import inspect
+
+    #move to config
+    DATABASE_URL_HISTORICAL_DATASET = 'postgresql://postgres:postgres@localhost:5432/historical_prices'
+
+
+    db = dataset.connect(DATABASE_URL_HISTORICAL_DATASET)
+    result = inspect(db.engine).get_table_names()
+    for item in result:
+        print(item)
+    
+    return jsonify(result)
 
 @app.get("/scatterplot")
 def scatterplot():

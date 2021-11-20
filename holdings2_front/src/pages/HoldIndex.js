@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 
+import SimpleMap from "../components/SimpleMap";
+
 function HoldIndex() {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState([]); // set default value to empty array
@@ -30,9 +32,14 @@ function HoldIndex() {
     );
   }
 
-  const tableNameArray = data.map((dispItem) => <li>{dispItem}</li>);
+  const tableNameArray = data.map((resItem) => <li>{resItem}</li>);
 
-  return <ul>{tableNameArray}</ul>;
+  return (
+    <div>
+      <ul>{tableNameArray}</ul>
+      {/* <SimpleMap holdObject={data} /> */}
+    </div>
+  );
 }
 
 export default HoldIndex;

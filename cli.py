@@ -4,7 +4,7 @@ import time
 import functools
 from decimal import Decimal
 import dataset
-from holdings2 import db, LBName, Tree 
+from holdings2 import db, LBName, Tree, HoldIndex 
 import yfinance as yf
 import csv, itertools
 import pandas as pd
@@ -156,6 +156,29 @@ def database_test():
             break
     # print('LBName:', result)
     # print('Tree:', result)
+@cli.command()
+def index_builder():
+    click.echo('build index for leaders & laggards')
+
+    # table_names = inspect(db.engine).get_table_names()
+    # if t_name in table_names:
+
+    HoldIndex.__table__.drop(db.engine)
+    db.create_all()
+    
+    date = '11-19-2021'
+    content_note = 'leaders & laggards'
+    
+    hi = HoldIndex()
+    hi.date = date
+    hi.content_note = content_note
+
+    db.session.add(hi)
+    db.session.commit()
+
+    for item in HoldIndex.query.all():
+        print(item)
+
 
 @cli.command()
 def topdown_drop_priceset():
@@ -582,7 +605,9 @@ cli.add_command(topdown_build_priceset)
 cli.add_command(show_entries)
 cli.add_command(topdown_build)
 cli.add_command(delete_entry)
+
 cli.add_command(update_prices_ll)
+
 cli.add_command(update_prices_fang)
 cli.add_command(update_prices_pm)
 cli.add_command(update_prices_soxx)
@@ -591,6 +616,8 @@ cli.add_command(update_prices_mj)
 cli.add_command(update_prices_retail)
 cli.add_command(update_prices_kweb)
 cli.add_command(visualize)
+
+cli.add_command(index_builder)
 
 if __name__ == '__main__':
     cli()

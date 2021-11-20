@@ -17,6 +17,8 @@ SPY_HOLDINGS_CSV = 'index_components/holdings-daily-us-en-spy_10302021.csv'
 
 #single etf scanner globas
 OUTPUT_FOR_CHART_FILE='PRACTICE_WORKING_FILE_WITH_CHART.xlsx'
+PRODUCTION_OUTPUT='WORKING_FILE_WITH_CHART.xlsx'
+
 
 def str_to_list_helper(str):
     str = str[1:]

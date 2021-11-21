@@ -4,7 +4,7 @@ import SimpleMap from "../components/SimpleMap";
 
 function HoldIndex() {
   const [isLoading, setIsLoading] = useState(true);
-  const [data, setData] = useState([]); // set default value to empty array
+  const [data, setData] = useState(); // set default value to empty array
 
   useEffect(() => {
     setIsLoading(true);
@@ -32,7 +32,11 @@ function HoldIndex() {
     );
   }
 
-  const tableNameArray = data.map((resItem) => <li>{resItem}</li>);
+  const tableNameArray = data.map((resItem) => (
+    <li key={resItem.id}>
+      {resItem.date.toString()} | {resItem.content_note} |
+    </li>
+  ));
 
   return (
     <div>

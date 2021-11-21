@@ -84,8 +84,9 @@ def holdindex():
 
     #move to config
     result = HoldIndex.query.all()
-    
-    return jsonify({'result': result})
+    print(type(result))
+    print(result)
+    return jsonify(result)
 
 @app.get("/scatterplot")
 def scatterplot():

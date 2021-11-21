@@ -172,8 +172,17 @@ def index_builder():
     hi = HoldIndex()
     hi.date = date
     hi.content_note = content_note
-
     db.session.add(hi)
+    db.session.commit()
+    
+    date = '11-19-2020'
+    content_note = 'semiconductors'
+    
+    hi2 = HoldIndex()
+    hi2.date = date
+    hi2.content_note = content_note
+
+    db.session.add(hi2)
     db.session.commit()
 
     for item in HoldIndex.query.all():

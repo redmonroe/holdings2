@@ -13,6 +13,7 @@ import openpyxl
 MASTER_ETF_AND_TAG_LIST = 'lb_1021.csv'
 ROWS = 500
 DATABASE_URL_HISTORICAL_DATASET = 'postgresql://postgres:postgres@localhost:5432/historical_prices'
+HOLDINDEX_URL_INDEX_OF_SCANS = 'postgresql://postgres:postgres@localhost:5432/holdindex_db'
 SPY_HOLDINGS_CSV = 'index_components/holdings-daily-us-en-spy_10302021.csv'
 
 #single etf scanner globas
@@ -165,15 +166,34 @@ def index_builder():
 
     HoldIndex.__table__.drop(db.engine)
     db.create_all()
+    # table.drop()
     
-    date = '11-19-2021'
-    content_note = 'leaders & laggards'
-    
+
+    db_set = dataset.connect(HOLDINDEX_URL_INDEX_OF_SCANS)
+
+    price_list = ['5', '10', '15']
+    name_list = ['goog', 'aapl', 'hd']
+
+    content_note = 'leaders'
+    date = '11/20/2021'
+
+    name = content_note + '_' + date
+
+    table = db_set[name]
+
+    for p, name in zip(price_list, name_list):
+        print('hi', str(p), name)
+        table.insert(dict(name=name, price=p))
     hi = HoldIndex()
     hi.date = date
     hi.content_note = content_note
     db.session.add(hi)
     db.session.commit()
+
+    """
+    date = '11-19-2021'
+    content_note = 'leaders & laggards'
+    
     
     date = '11-19-2020'
     content_note = 'semiconductors'
@@ -184,6 +204,7 @@ def index_builder():
 
     db.session.add(hi2)
     db.session.commit()
+    """
 
     for item in HoldIndex.query.all():
         print(item)
@@ -444,8 +465,11 @@ def topdown_explore():
 @timer
 def update_prices_ll():
     click.echo('updating leaders & laggard prices')
+
+    ##prices need to go to separately table; then we will try to find that table
+    #add 'type' ie leaders and laggards
     
-    init_table(t_name='lb_name')  
+    # init_table(t_name='lb_name')  
     
     csv_file='LBOARD_BROAD_ASSET_CLASS_1121.csv'
     price_updater(filename=csv_file)

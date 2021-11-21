@@ -40,6 +40,7 @@ function HoldIndex() {
 
   return (
     <div>
+      <h2>index of contents</h2>
       <ul>{tableNameArray}</ul>
       {/* <SimpleMap holdObject={data} /> */}
     </div>

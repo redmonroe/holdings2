@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
-import SimpleMap from "../components/SimpleMap";
+import HIndexButton from "../components/HIndexButton";
 
 function HoldIndex() {
   const [isLoading, setIsLoading] = useState(true);
@@ -34,7 +35,9 @@ function HoldIndex() {
 
   const tableNameArray = data.map((resItem) => (
     <li key={resItem.id}>
-      {resItem.date.toString()} | {resItem.content_note} |
+      <HIndexButton date={resItem.date.toString()} name={resItem.content_note}>
+        {resItem.date.toString()} | {resItem.content_note} |
+      </HIndexButton>
     </li>
   ));
 

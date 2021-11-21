@@ -88,6 +88,14 @@ def holdindex():
     print(result)
     return jsonify(result)
 
+@app.post('/lookup_index')
+def lookup_index():
+
+    table_name = request.get_json(silent=True)
+    print(table_name)
+
+    return jsonify(table_name)
+    
 @app.get("/scatterplot")
 def scatterplot():
     # result = LBName.query.all()

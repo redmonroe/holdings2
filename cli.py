@@ -9,11 +9,13 @@ import yfinance as yf
 import csv, itertools
 import pandas as pd
 import openpyxl
+from holdings2 import app
+from config import Config
 
 MASTER_ETF_AND_TAG_LIST = 'lb_1021.csv'
 ROWS = 500
 DATABASE_URL_HISTORICAL_DATASET = 'postgresql://postgres:postgres@localhost:5432/historical_prices'
-HOLDINDEX_URL_INDEX_OF_SCANS = 'postgresql://postgres:postgres@localhost:5432/holdindex_db'
+
 SPY_HOLDINGS_CSV = 'index_components/holdings-daily-us-en-spy_10302021.csv'
 
 #single etf scanner globas
@@ -118,6 +120,10 @@ def cli():
     pass
 
 @cli.command()
+def config_test():
+    print(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
+
+@cli.command()
 def database_test():
     db.create_all()
     table_names = inspect(db.engine).get_table_names()
@@ -166,10 +172,8 @@ def index_builder():
 
     HoldIndex.__table__.drop(db.engine)
     db.create_all()
-    # table.drop()
     
-
-    db_set = dataset.connect(HOLDINDEX_URL_INDEX_OF_SCANS)
+    db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
 
     price_list = ['5', '10', '15']
     name_list = ['goog', 'aapl', 'hd']
@@ -177,17 +181,33 @@ def index_builder():
     content_note = 'leaders'
     date = '11/20/2021'
 
+    content_note2 ='semis'
+    date2 = '12/05/2020'
+
     name = content_note + '_' + date
+    name2 = content_note2 + '_' + date2
 
     table = db_set[name]
+    table2 = db_set[name2]
+    # table.drop()
 
     for p, name in zip(price_list, name_list):
         print('hi', str(p), name)
         table.insert(dict(name=name, price=p))
+        table2.insert(dict(name=name, price=p))
+        
+    
+    
     hi = HoldIndex()
     hi.date = date
     hi.content_note = content_note
     db.session.add(hi)
+    db.session.commit()
+
+    hi2 = HoldIndex()
+    hi2.date = date2
+    hi2.content_note = content_note2
+    db.session.add(hi2)
     db.session.commit()
 
     """

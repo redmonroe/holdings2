@@ -1,7 +1,8 @@
 from dataclasses import dataclass
+from sqlalchemy import inspect
 import dataset
 import os
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from config import Config
@@ -91,11 +92,21 @@ def holdindex():
 @app.post('/lookup_index')
 def lookup_index():
 
+    db_dataset = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
+ 
+    print('ll', db_dataset.tables)
     table_name = request.get_json(silent=True)
-    print(table_name)
 
-    return jsonify(table_name)
-    
+    for item in db_dataset.tables:
+        if item == table_name:
+            result = table_name
+
+    # table_names = inspect(db.engine).get_table_names()
+    # for item in table_names:
+    #     print(item)
+
+    return jsonify(result)
+
 @app.get("/scatterplot")
 def scatterplot():
     # result = LBName.query.all()

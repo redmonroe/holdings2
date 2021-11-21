@@ -178,6 +178,9 @@ def index_builder():
     price_list = ['5', '10', '15']
     name_list = ['goog', 'aapl', 'hd']
 
+    price_list2 = ['35', '310', '315']
+    name_list2 = ['shw', 'tsla', 'low']
+    
     content_note = 'leaders'
     date = '11/20/2021'
 
@@ -190,14 +193,16 @@ def index_builder():
     table = db_set[name]
     table2 = db_set[name2]
     # table.drop()
+    # table2.drop()
 
     for p, name in zip(price_list, name_list):
         print('hi', str(p), name)
         table.insert(dict(name=name, price=p))
+
+    for p, name in zip(price_list2, name_list2):
+        print('h2', str(p), name)
         table2.insert(dict(name=name, price=p))
         
-    
-    
     hi = HoldIndex()
     hi.date = date
     hi.content_note = content_note
@@ -209,22 +214,6 @@ def index_builder():
     hi2.content_note = content_note2
     db.session.add(hi2)
     db.session.commit()
-
-    """
-    date = '11-19-2021'
-    content_note = 'leaders & laggards'
-    
-    
-    date = '11-19-2020'
-    content_note = 'semiconductors'
-    
-    hi2 = HoldIndex()
-    hi2.date = date
-    hi2.content_note = content_note
-
-    db.session.add(hi2)
-    db.session.commit()
-    """
 
     for item in HoldIndex.query.all():
         print(item)

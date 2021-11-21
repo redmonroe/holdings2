@@ -1,9 +1,13 @@
 import ScatterPlot from "../components/ScatterPlot";
+import { useLocation } from "react-router-dom";
 
-function PlotA() {
+function PlotA(props) {
+  const { state } = useLocation();
+
+  console.log("inside PlotA", state);
   return (
     <div>
-      <ScatterPlot></ScatterPlot>
+      <ScatterPlot incoming_data={state}></ScatterPlot>
     </div>
   );
 }

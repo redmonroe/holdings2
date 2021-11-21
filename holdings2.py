@@ -94,18 +94,18 @@ def lookup_index():
 
     db_dataset = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
  
-    print('ll', db_dataset.tables)
     table_name = request.get_json(silent=True)
 
     for item in db_dataset.tables:
         if item == table_name:
             result = table_name
 
-    # table_names = inspect(db.engine).get_table_names()
-    # for item in table_names:
-    #     print(item)
+    results = db_dataset[result].all()
+    result_list = [item for item in results]
 
-    return jsonify(result)
+    print(result_list)
+
+    return jsonify(result_list )
 
 @app.get("/scatterplot")
 def scatterplot():

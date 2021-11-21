@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function HIndexButton({ name, date }) {
   const [data, setData] = useState(false);
+  let navigate = useNavigate();
 
   function OnClickHoldIndex({ name, date }) {
     const DBName = name.concat("_", date);
@@ -22,7 +24,8 @@ function HIndexButton({ name, date }) {
         console.log(err);
       })
       .finally(() => {
-        console.log(data);
+        console.log("inside button:", data);
+        navigate("/plota", { data });
         // setIsLoading(false);
       });
   }

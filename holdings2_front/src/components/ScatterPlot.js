@@ -2,37 +2,54 @@ import React, { useState, useEffect } from "react";
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid } from "recharts";
 
 function ScatterPlot({ incoming_data }) {
-  // const [isLoading, setIsLoading] = useState(true);
-  const [data, setData] = useState(); // set default value to empty array
+  const [isLoading, setIsLoading] = useState(true);
+  const [data, setData] = useState();
+  // const [incomingData, setIncomingData] = useState();
 
-  // setData(incoming_data);
-  console.log("inside function:", incoming_data);
-  // useEffect(() => {
-  //   setIsLoading(true);
+  // setIncomingData(incoming_data);
 
-  //   fetch("/scatterplot")
-  //     .then((result) => result.json())
-  //     .then((data) => {
-  //       setData(data);
-  //       console.log(data);
-  //       console.log(typeof data);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     })
-  //     .finally(() => {
-  //       setIsLoading(false);
-  //     });
-  // }, []);
+  useEffect(() => {
+    setIsLoading(true);
 
-  // if (isLoading) {
-  //   return (
-  //     <section>
-  //       <p>Loading...</p>
-  //     </section>
-  //   );
-  // }
+    fetch("/lookup_index", {
+      method: "POST",
+      body: JSON.stringify(incoming_data),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((result) => result.json())
+      .then((data) => {
+        setData(data);
+        console.log("table I picked:", data);
+        console.log(typeof data);
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+        console.log("finally:", data);
+      });
+  }, []);
 
+  if (isLoading) {
+    return (
+      <section>
+        <p>Loading...</p>
+      </section>
+    );
+  }
+
+  function Transform(data) {
+    console.log("Transform:", data);
+    const test_data = [{ x: data[0]["price"], y: 50 }];
+    console.log("Transform:", test_data);
+    return test_data;
+  }
+
+  const data2 = Transform(data);
+  console.log(data2);
   //   const test_data = [
   //     { x: 1, y: 23 },
   //     { x: 2, y: 3 },
@@ -56,7 +73,7 @@ function ScatterPlot({ incoming_data }) {
         <CartesianGrid />
         <XAxis type='number' dataKey='x' />
         <YAxis type='number' dataKey='y' />
-        <Scatter data={data} fill='green' />
+        <Scatter data={data2} fill='green' />
       </ScatterChart>
     </div>
   );

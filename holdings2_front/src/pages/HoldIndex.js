@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 
 import HIndexButton from "../components/HIndexButton";
 
 function HoldIndex() {
   const [isLoading, setIsLoading] = useState(true);
-  const [data, setData] = useState(); // set default value to empty array
+  const [data, setData] = useState();
 
   useEffect(() => {
     setIsLoading(true);
@@ -14,8 +13,8 @@ function HoldIndex() {
       .then((result) => result.json())
       .then((data) => {
         setData(data);
-        console.log(data);
-        console.log(typeof data);
+        // console.log(data);
+        // console.log(typeof data);
       })
       .catch((err) => {
         console.log(err);
@@ -45,7 +44,6 @@ function HoldIndex() {
     <div>
       <h2>index of contents</h2>
       <ul>{tableNameArray}</ul>
-      {/* <SimpleMap holdObject={data} /> */}
     </div>
   );
 }

@@ -4,10 +4,9 @@ import { useLocation } from "react-router-dom";
 function PlotA(props) {
   const { state } = useLocation();
 
-  console.log("inside PlotA", state);
   return (
     <div>
-      <ScatterPlot incoming_data={state}></ScatterPlot>
+      <ScatterPlot incoming_data={state.db}></ScatterPlot>
     </div>
   );
 }

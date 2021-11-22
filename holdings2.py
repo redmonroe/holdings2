@@ -105,7 +105,7 @@ def lookup_index():
 
     print(result_list)
 
-    return jsonify(result_list )
+    return jsonify(result_list)
 
 @app.get("/scatterplot")
 def scatterplot():

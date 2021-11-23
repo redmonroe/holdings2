@@ -51,37 +51,31 @@ function ScatterPlot({ incoming_data }) {
 
   function Transform(data) {
     console.log("Transform:", data);
-    const test_data = [{ x: data[0]["gain_factor"], y: data[0]["off_hi"] }];
-    console.log("Transform:", test_data);
-    return test_data;
+    const dataArray = [];
+    data.forEach((stock) => {
+      let newObj = {};
+      newObj["x"] = stock["gain_factor"];
+      newObj["y"] = stock["off_hi"];
+      newObj["z"] = stock["name"];
+      dataArray.push(newObj);
+    });
+    console.log("Transform:", dataArray);
+    return dataArray;
   }
 
   const data2 = Transform(data);
   console.log(data2);
-  //   const test_data = [
-  //     { x: 1, y: 23 },
-  //     { x: 2, y: 3 },
-  //     { x: 3, y: 15 },
-  //     { x: 4, y: 35 },
-  //     { x: 5, y: 45 },
-  //     { x: 6, y: 25 },
-  //     { x: 7, y: 17 },
-  //     { x: 8, y: 32 },
-  //     { x: 9, y: 43 },
-  //   ];
 
   return (
     <div>
-      <p>ScatterChart ReChart</p>
-      <h1>
-        scattercharts will accept a list of dicts directly, does not have the
-        React issue rendering children from dicts
-      </h1>
-      <ScatterChart width={800} height={800}>
+      <p>ScatterChart {incoming_data}</p>
+      <ScatterChart width={800} height={600}>
         <CartesianGrid />
-        <XAxis type='number' dataKey='x' />
-        <YAxis type='number' dataKey='y' />
-        <Scatter data={data2} fill='green' />
+        <XAxis type='number' dataKey='x' domain={[0, 4]} />
+        <YAxis type='number' dataKey='y' domain={[-100, 0]} />
+        <Scatter data={data2} fill='green'>
+          <LabelList dataKey='z' />
+        </Scatter>
       </ScatterChart>
     </div>
   );

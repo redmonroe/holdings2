@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid } from "recharts";
+import {
+  ScatterChart,
+  Scatter,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  LabelList,
+} from "recharts";
 
 function ScatterPlot({ incoming_data }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -43,7 +51,7 @@ function ScatterPlot({ incoming_data }) {
 
   function Transform(data) {
     console.log("Transform:", data);
-    const test_data = [{ x: data[0]["price"], y: 50 }];
+    const test_data = [{ x: data[0]["gain_factor"], y: data[0]["off_hi"] }];
     console.log("Transform:", test_data);
     return test_data;
   }
@@ -69,7 +77,7 @@ function ScatterPlot({ incoming_data }) {
         scattercharts will accept a list of dicts directly, does not have the
         React issue rendering children from dicts
       </h1>
-      <ScatterChart width={400} height={400}>
+      <ScatterChart width={800} height={800}>
         <CartesianGrid />
         <XAxis type='number' dataKey='x' />
         <YAxis type='number' dataKey='y' />

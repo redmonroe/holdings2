@@ -67,7 +67,7 @@ function ScatterPlot({ incoming_data }) {
       <p>ScatterChart ReChart</p>
       <h1>
         scattercharts will accept a list of dicts directly, does not have the
-        React issue rending children from dicts
+        React issue rendering children from dicts
       </h1>
       <ScatterChart width={400} height={400}>
         <CartesianGrid />

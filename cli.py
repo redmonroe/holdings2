@@ -1,4 +1,5 @@
 from sqlalchemy import inspect
+from datetime import date
 import click
 import time
 import functools
@@ -175,49 +176,66 @@ def index_builder():
     
     db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
 
-    price_list = ['5', '10', '15']
-    name_list = ['goog', 'aapl', 'hd']
+    def price_updater2(tablename=None, filename=None):
+        with open(filename, encoding='utf-8') as csvf: 
+            #load csv file data using csv library's dictionary reader
+            csvReader = csv.DictReader(csvf) 
 
-    price_list2 = ['35', '310', '315']
-    name_list2 = ['shw', 'tsla', 'low']
-    
-    content_note = 'leaders'
-    date = '11/20/2021'
+            for count, row in enumerate(csvReader, 1):
+                item = LBName()
+                print(row)
+                try:
+                    item.name = row['\ufeffname']
+                except KeyError as e:
+                    print(f'ufeff_error: {e}, will attempt to try row[name]')
+                    item.name = row['name']
+                try:                
+                    price = yf.download(item.name, period='1y', interval='1wk')
+                    current_price = price['Close'].tail(1).item()
+                    lo52 = price['Close'].min()
+                    hi52 = price['Close'].max()
+                    gain_factor = current_price/lo52
+                    off_hi = (current_price/hi52) -1
+                    print(count, item.name, current_price, gain_factor, off_hi)
+                    tablename.insert(dict(name=item.name, off_hi=off_hi, gain_factor=gain_factor))
+                except Exception as e:
+                    print(e, f'unable download ticker {item.name}')
 
-    content_note2 ='semis'
-    date2 = '12/05/2020'
 
-    name = content_note + '_' + date
-    name2 = content_note2 + '_' + date2
+    filename='index_components/fang_names.csv'
 
-    table = db_set[name]
-    table2 = db_set[name2]
-    # table.drop()
-    # table2.drop()
+    date_now = date.today()
+    tablename = filename + '_' + str(date_now)
+    tablename = db_set[tablename]
+    price_updater2(tablename=tablename, filename=filename)
 
-    for p, name in zip(price_list, name_list):
-        print('hi', str(p), name)
-        table.insert(dict(name=name, price=p))
-
-    for p, name in zip(price_list2, name_list2):
-        print('h2', str(p), name)
-        table2.insert(dict(name=name, price=p))
-        
     hi = HoldIndex()
-    hi.date = date
-    hi.content_note = content_note
+    hi.date = date_now
+    hi.content_note = filename
     db.session.add(hi)
     db.session.commit()
 
-    hi2 = HoldIndex()
-    hi2.date = date2
-    hi2.content_note = content_note2
-    db.session.add(hi2)
-    db.session.commit()
 
+    print(date.today())
+    # # table.drop()
+
+    # for p, name in zip(price_list, name_list):
+    #     print('hi', str(p), name)
+    #     table.insert(dict(name=name, price=p))
+
+    # for p, name in zip(price_list2, name_list2):
+    #     print('h2', str(p), name)
+    #     table2.insert(dict(name=name, price=p))
+        
     for item in HoldIndex.query.all():
         print(item)
 
+@cli.command()
+def drop_single_dataset_table_manual():
+    
+    db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
+    table = db_set['index_components/fang_names.csv_<class datetime.date>']
+    table.drop()
 
 @cli.command()
 def topdown_drop_priceset():

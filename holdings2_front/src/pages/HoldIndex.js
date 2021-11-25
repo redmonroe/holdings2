@@ -15,8 +15,6 @@ function HoldIndex() {
       .then((result) => result.json())
       .then((data) => {
         setData(data);
-        // console.log(data);
-        // console.log(typeof data);
       })
       .catch((err) => {
         console.log(err);

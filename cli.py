@@ -467,6 +467,8 @@ def topdown_explore():
 
     topdown_presenter(result_list=comparison_list)
 
+
+
 @cli.command()
 @timer
 def update_prices_ll():
@@ -506,7 +508,7 @@ def update_prices_homies():
     init_table(t_name='lb_name')
 
     csv_file='index_components/itb.csv'
-    price_updater(filename=csv_file)
+    index_builder_dev(filename=csv_file)
 
 @cli.command()
 @timer
@@ -516,7 +518,7 @@ def update_prices_mj():
     init_table(t_name='lb_name')
 
     csv_file='index_components/mj.csv'
-    price_updater(filename=csv_file)
+    index_builder_dev(filename=csv_file)
 
 @cli.command()
 @timer
@@ -526,7 +528,7 @@ def update_prices_retail():
     init_table(t_name='lb_name')
 
     csv_file='index_components/retail_xrt.csv'
-    price_updater(filename=csv_file)
+    index_builder_dev(filename=csv_file)
 
 @cli.command()
 @timer
@@ -536,7 +538,7 @@ def update_prices_kweb():
     init_table(t_name='lb_name')
 
     csv_file='index_components/kweb.csv'
-    price_updater(filename=csv_file)
+    index_builder_dev(filename=csv_file)
 
 @cli.command()
 @timer
@@ -546,7 +548,7 @@ def update_prices_igv():
     init_table(t_name='lb_name')
 
     csv_file='index_components/igv.csv'
-    price_updater(filename=csv_file)
+    index_builder_dev(filename=csv_file)
 
 
 
@@ -588,6 +590,21 @@ def update_prices_pm():
                     print(e, f'unable download ticker {item.name}')
 
     db.session.close()
+
+@cli.command()
+@timer
+def update_all():
+    click.echo('updating all')
+
+    update_prices_ll
+    update_prices_fang()
+    update_prices_soxx()
+    update_prices_mj()
+    update_prices_homies()
+    update_prices_retail()
+    update_prices_igv()
+    update_prices_kweb()
+    # update_prices_pm()
 
 @cli.command()
 def show_entries():
@@ -651,6 +668,10 @@ cli.add_command(update_prices_homies)
 cli.add_command(update_prices_mj)
 cli.add_command(update_prices_retail)
 cli.add_command(update_prices_kweb)
+cli.add_command(update_all)
+
+
+
 cli.add_command(visualize)
 
 

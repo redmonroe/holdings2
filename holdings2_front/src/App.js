@@ -4,12 +4,10 @@ import { Routes, Route } from "react-router-dom";
 
 import HoldIndex from "./pages/HoldIndex";
 import PlotA from "./pages/PlotA";
-// import ScatterPlot from "./components/ScatterPlot";
 
 import MainNavigation from "./components/MainNavigation";
 
 const App = () => {
-  // Sample data
   return (
     <div>
       <MainNavigation />
@@ -18,7 +16,6 @@ const App = () => {
         <Route path='/plota' element={<PlotA />} />
         <Route path='/holdindex' element={<HoldIndex />} />
       </Routes>
-      {/* </MainNavigation> */}
     </div>
   );
 };

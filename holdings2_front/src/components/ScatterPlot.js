@@ -66,10 +66,11 @@ function ScatterPlot({ incoming_data }) {
     <div>
       <p>ScatterChart {incoming_data}</p>
       {/* <ResponsiveContainer> */}
-      <ScatterChart width={800} height={600}>
+      <ScatterChart width={3000} height={800}>
         <CartesianGrid />
-        <XAxis type='number' dataKey='x' domain={[0, 4]} />
+        <XAxis type='number' dataKey='x' domain={[1, 4]} />
         <YAxis type='number' dataKey='y' domain={[-100, 0]} />
+        <Tooltip cursor={"4"} />
         <Scatter data={data2} fill='blue'>
           <LabelList dataKey='z' position='bottom' />
         </Scatter>

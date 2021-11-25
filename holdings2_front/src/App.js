@@ -6,17 +6,19 @@ import HoldIndex from "./pages/HoldIndex";
 import PlotA from "./pages/PlotA";
 // import ScatterPlot from "./components/ScatterPlot";
 
+import MainNavigation from "./components/MainNavigation";
+
 const App = () => {
   // Sample data
   return (
     <div>
-      <Fragment>
-        <Routes>
-          <Route path='/' exact element={<HoldIndex />} />
-          <Route path='/plota' element={<PlotA />} />
-          <Route path='/holdindex' element={<HoldIndex />} />
-        </Routes>
-      </Fragment>
+      <MainNavigation />
+      <Routes>
+        <Route path='/' exact element={<HoldIndex />} />
+        <Route path='/plota' element={<PlotA />} />
+        <Route path='/holdindex' element={<HoldIndex />} />
+      </Routes>
+      {/* </MainNavigation> */}
     </div>
   );
 };

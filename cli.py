@@ -74,14 +74,17 @@ def init_table(t_name=None):
     
     db.create_all()
 
-def price_writer(filename=None):
-    # query = LBN
-    df = pd.read_sql_table('lb_name', con=db.engine )
-
-    # with pd.ExcelWriter(filename, mode='a') as writer:
-    #     df.to_excel(writer, sheet_name='another sheet', index=False)
-
-    # df.to_excel(filename, columns=['id', 'name', 'gain_factor', 'off_hi'], index=False)
+#drop tables by list
+def drop_dataset_tables(csv_file=None):
+    from dataset import Table
+    with open(csv_file, encoding='utf-8') as csvf: 
+        
+        csv_reader = csv.DictReader(csvf) 
+        ticker_list = []
+        for count, row in enumerate(itertools.islice(csv_reader, ROWS), 1):
+            print(count, row['Ticker'])
+            name = row['Ticker']   
+            Table(db, name).drop()
 
 def price_updater(filename=None):
     with open(filename, encoding='utf-8') as csvf: 
@@ -136,6 +139,7 @@ def HIndex_price_updater(tablename=None, filename=None):
                 hi52 = price['Close'].max()
                 gain_factor = current_price/lo52
                 off_hi = (current_price/hi52) -1
+                off_hi = off_hi * 100
                 print(count, item.name, current_price, gain_factor, off_hi)
                 tablename.insert(dict(name=item.name, off_hi=off_hi, gain_factor=gain_factor))
             except Exception as e:
@@ -189,30 +193,27 @@ def database_test():
         print(count, item)
         if count == 5:
             break
-    # print('LBName:', result)
-    # print('Tree:', result)
-@cli.command()
-def index_builder():
-    click.echo('runing scan for xxx and building index')
 
-    # table_names = inspect(db.engine).get_table_names()
-    # if t_name in table_names:
 
-    HoldIndex.__table__.drop(db.engine)
-    db.create_all()
-    
+def index_builder_dev(filename=None):
+    print(f'running scan and creating index entry for {filename}')    
     db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
 
-    filename='index_components/fang_names.csv'
+    if filename == 'LBOARD_BROAD_ASSET_CLASS_1121.csv':
+        file_str = 'leaders & laggards'
+    else:
+        file_str = filename.split('/')
+        file_str = file_str[1].split('.')
+        file_str = file_str[0]
 
     date_now = date.today()
-    tablename = filename + '_' + str(date_now)
+    tablename = file_str + '_' + str(date_now)
     tablename = db_set[tablename]
     HIndex_price_updater(tablename=tablename, filename=filename)
 
     hi = HoldIndex()
     hi.date = date_now
-    hi.content_note = filename
+    hi.content_note = file_str
     db.session.add(hi)
     db.session.commit()
         
@@ -230,17 +231,6 @@ def drop_single_dataset_table_manual():
 def topdown_drop_priceset():
     click.echo('drop timeseries data for topdown')
     db = dataset.connect(DATABASE_URL_HISTORICAL_DATASET)
-    #drop tables by list
-    def drop_dataset_tables(csv_file=None):
-        from dataset import Table
-        with open(csv_file, encoding='utf-8') as csvf: 
-            
-            csv_reader = csv.DictReader(csvf) 
-            ticker_list = []
-            for count, row in enumerate(itertools.islice(csv_reader, ROWS), 1):
-                print(count, row['Ticker'])
-                name = row['Ticker']   
-                Table(db, name).drop()
 
     drop_dataset_tables(csv_file=SPY_HOLDINGS_CSV) 
 
@@ -481,14 +471,11 @@ def topdown_explore():
 @timer
 def update_prices_ll():
     click.echo('updating leaders & laggard prices')
-
-    ##prices need to go to separately table; then we will try to find that table
-    #add 'type' ie leaders and laggards
     
-    # init_table(t_name='lb_name')  
+    init_table(t_name='lb_name')  
     
     csv_file='LBOARD_BROAD_ASSET_CLASS_1121.csv'
-    price_updater(filename=csv_file)
+    index_builder_dev(filename=csv_file)
     
 @cli.command()
 @timer
@@ -498,7 +485,7 @@ def update_prices_fang():
     init_table(t_name='lb_name')
 
     csv_file='index_components/fang_names.csv'
-    price_updater(filename=csv_file)
+    index_builder_dev(filename=csv_file)
 
 @cli.command()
 @timer
@@ -508,7 +495,7 @@ def update_prices_soxx():
     init_table(t_name='lb_name')
 
     csv_file='index_components/soxx.csv'
-    price_updater(filename=csv_file)
+    index_builder_dev(filename=csv_file)
 
 
 @cli.command()
@@ -666,7 +653,6 @@ cli.add_command(update_prices_retail)
 cli.add_command(update_prices_kweb)
 cli.add_command(visualize)
 
-cli.add_command(index_builder)
 
 if __name__ == '__main__':
     cli()

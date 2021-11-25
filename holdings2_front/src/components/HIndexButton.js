@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 
+import classes from "./HIndexButton.module.css";
+
 function HIndexButton({ name, date }) {
   const navigate = useNavigate();
 
@@ -11,7 +13,10 @@ function HIndexButton({ name, date }) {
   }
 
   return (
-    <button onClick={() => ClickHandler({ name, date })}>
+    <button
+      className={classes.button}
+      onClick={() => ClickHandler({ name, date })}
+    >
       {name} {date}
     </button>
   );

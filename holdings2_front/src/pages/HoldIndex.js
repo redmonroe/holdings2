@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 
 import HIndexButton from "../components/HIndexButton";
 
+import classes from "./HoldIndex.module.css";
+
 function HoldIndex() {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState();
@@ -42,7 +44,7 @@ function HoldIndex() {
 
   return (
     <div>
-      <h2>index of contents</h2>
+      <h2 className={classes.h2}>index of contents</h2>
       <ul>{tableNameArray}</ul>
     </div>
   );

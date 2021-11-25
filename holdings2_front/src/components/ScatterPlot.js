@@ -7,6 +7,7 @@ import {
   CartesianGrid,
   Tooltip,
   LabelList,
+  ResponsiveContainer,
 } from "recharts";
 
 function ScatterPlot({ incoming_data }) {
@@ -29,15 +30,13 @@ function ScatterPlot({ incoming_data }) {
       .then((result) => result.json())
       .then((data) => {
         setData(data);
-        console.log("table I picked:", data);
-        console.log(typeof data);
+        console.log("scatterPlot.js:", data, typeof data);
       })
       .catch((err) => {
         console.log(err);
       })
       .finally(() => {
         setIsLoading(false);
-        console.log("finally:", data);
       });
   }, []);
 
@@ -50,7 +49,6 @@ function ScatterPlot({ incoming_data }) {
   }
 
   function Transform(data) {
-    console.log("Transform:", data);
     const dataArray = [];
     data.forEach((stock) => {
       let newObj = {};
@@ -58,25 +56,25 @@ function ScatterPlot({ incoming_data }) {
       newObj["y"] = stock["off_hi"];
       newObj["z"] = stock["name"];
       dataArray.push(newObj);
-    });
-    console.log("Transform:", dataArray);
+    }); // console.log("Transform:", dataArray);
     return dataArray;
   }
 
   const data2 = Transform(data);
-  console.log(data2);
 
   return (
     <div>
       <p>ScatterChart {incoming_data}</p>
+      {/* <ResponsiveContainer> */}
       <ScatterChart width={800} height={600}>
         <CartesianGrid />
         <XAxis type='number' dataKey='x' domain={[0, 4]} />
         <YAxis type='number' dataKey='y' domain={[-100, 0]} />
-        <Scatter data={data2} fill='green'>
-          <LabelList dataKey='z' />
+        <Scatter data={data2} fill='blue'>
+          <LabelList dataKey='z' position='bottom' />
         </Scatter>
       </ScatterChart>
+      {/* </ResponsiveContainer> */}
     </div>
   );
 }

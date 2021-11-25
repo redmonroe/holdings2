@@ -1,3 +1,4 @@
+from sqlalchemy import inspect
 from dataclasses import dataclass
 from sqlalchemy import inspect
 import dataset
@@ -81,9 +82,6 @@ def home():
 @app.get('/holdindex')
 def holdindex():
 
-    from sqlalchemy import inspect
-
-    #move to config
     result = HoldIndex.query.all()
     print(type(result))
     print(result)
@@ -102,8 +100,6 @@ def lookup_index():
 
     results = db_dataset[result].all()
     result_list = [item for item in results]
-
-    print(result_list)
 
     return jsonify(result_list)
 

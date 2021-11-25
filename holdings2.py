@@ -57,24 +57,19 @@ class Tree(db.Model):
     data = db.Column(db.String(64))
     children = db.relationship('Tree')
 
-# @dataclass
-# class Tag(db.Model):
-#     id: int
 
-#     id = db.Column(db.Integer, primary_key=True)
+@dataclass
+class ETFDB(db.Model):
+    id: int
+    name: str
+    type1: str
 
-'''
-class Person(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False)
-    addresses = db.relationship('Address', backref='person', lazy=True)
+    name = db.Column(db.String(64))
+    type1 = db.Column(db.String(64))
 
-class Address(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), nullable=False)
-    person_id = db.Column(db.Integer, db.ForeignKey('person.id'),
-        nullable=False)
-'''
+'''routes'''
+
 @app.get('/')
 def home():
     return 'hello_world'
@@ -102,14 +97,3 @@ def lookup_index():
     result_list = [item for item in results]
 
     return jsonify(result_list)
-
-@app.get("/scatterplot")
-def scatterplot():
-    # result = LBName.query.all()
-    result = [{
-        'x': '1', 
-        'y': '10'
-    }]
-    print(result)
-
-    return jsonify(result)

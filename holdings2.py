@@ -68,6 +68,37 @@ class ETFDB(db.Model):
     name = db.Column(db.String(64))
     type1 = db.Column(db.String(64))
 
+    @staticmethod
+    def from_csv(type1, filename=None):
+        print('hello world')
+        import csv
+        with open(filename, encoding='utf-8') as csvf: 
+            
+            #load csv file data using csv library's dictionary reader
+            csvReader = csv.DictReader(csvf) 
+
+            for count, row in enumerate(csvReader, 1):
+                item = ETFDB()
+                item.type1 = type1
+                # print(row)
+                try:
+                    item.name = row['\ufeffname']
+                except KeyError as e:
+                    print(f'ufeff_error: {e}, will attempt to try row[name]')
+                    item.name = row['name']
+                try:                
+                    print(count, item.name, item.type1)
+                    db.session.add(item)
+                    db.session.commit()
+                except Exception as e:
+                    print(e, f'failed to load {item.name}')
+
+        db.session.close()
+
+
+
+
+
 '''routes'''
 
 @app.get('/')

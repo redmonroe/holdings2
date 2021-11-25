@@ -5,7 +5,7 @@ import time
 import functools
 from decimal import Decimal
 import dataset
-from holdings2 import db, LBName, Tree, HoldIndex 
+from holdings2 import db, LBName, Tree, HoldIndex, ETFDB 
 import yfinance as yf
 import csv, itertools
 import pandas as pd
@@ -467,7 +467,23 @@ def topdown_explore():
 
     topdown_presenter(result_list=comparison_list)
 
+@cli.command()
+@timer
+def load_to_db():
+    from pathlib import Path
+    import os
 
+    try:
+        type1 = str(input('Enter tag for etf or stocks we are entering: '))
+        filename = Path(input('Enter path to ***CSV*** you would like to enter: '))
+        choice = int(input(f'you picked {type1} and {filename}. if correct, press 1.'))
+        if choice == 1:
+            print(type(filename), filename)
+            ETFDB.from_csv(type1=type1, filename=filename)
+        else:
+            print('bye')
+    except Exception as e:
+        print(e)
 
 @cli.command()
 @timer
@@ -476,8 +492,34 @@ def update_prices_ll():
     
     init_table(t_name='lb_name')  
     
-    csv_file='LBOARD_BROAD_ASSET_CLASS_1121.csv'
-    index_builder_dev(filename=csv_file)
+    for item in ETFDB.query.filter_by(type1='l_and_l').all():
+        type1 = item.type1
+        print(item.name, item.type1)
+
+    db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
+
+    date_now = date.today()
+    tablename = type1 + '_' + str(date_now)
+    print(tablename)
+    tablename = db_set[tablename]
+    HIndex_price_updater(tablename=tablename, filename=filename)
+
+    hi = HoldIndex()
+    hi.date = date_now
+    hi.content_note = type1
+    db.session.add(hi)
+    db.session.commit()
+        
+
+
+
+
+
+
+
+
+
+    # index_builder_dev(filename=csv_file)
     
 @cli.command()
 @timer

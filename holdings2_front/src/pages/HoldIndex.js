@@ -45,7 +45,7 @@ function HoldIndex() {
   return (
     <div>
       <h2 className={classes.h2}>index of contents</h2>
-      <ul>{tableNameArray}</ul>
+      <ul>{tableNameArray.reverse()}</ul>
     </div>
   );
 }

@@ -119,34 +119,6 @@ def price_updater(filename=None):
 
     db.session.close()
 
-def HIndex_price_updater(tablename=None, filename=None):
-    with open(filename, encoding='utf-8') as csvf: 
-        #load csv file data using csv library's dictionary reader
-        csvReader = csv.DictReader(csvf) 
-
-        for count, row in enumerate(csvReader, 1):
-            item = LBName()
-            print(row)
-            try:
-                item.name = row['\ufeffname']
-            except KeyError as e:
-                print(f'ufeff_error: {e}, will attempt to try row[name]')
-                item.name = row['name']
-            try:                
-                price = yf.download(item.name, period='1y', interval='1wk')
-                current_price = price['Close'].tail(1).item()
-                lo52 = price['Close'].min()
-                hi52 = price['Close'].max()
-                gain_factor = current_price/lo52
-                off_hi = (current_price/hi52) -1
-                off_hi = off_hi * 100
-                print(count, item.name, current_price, gain_factor, off_hi)
-                tablename.insert(dict(name=item.name, off_hi=off_hi, gain_factor=gain_factor))
-            except Exception as e:
-                print(e, f'unable download ticker {item.name}')
-
-
-
 @click.group()
 def cli():
     pass
@@ -194,31 +166,6 @@ def database_test():
         if count == 5:
             break
 
-
-def index_builder_dev(filename=None):
-    print(f'running scan and creating index entry for {filename}')    
-    db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
-
-    if filename == 'LBOARD_BROAD_ASSET_CLASS_1121.csv':
-        file_str = 'leaders & laggards'
-    else:
-        file_str = filename.split('/')
-        file_str = file_str[1].split('.')
-        file_str = file_str[0]
-
-    date_now = date.today()
-    tablename = file_str + '_' + str(date_now)
-    tablename = db_set[tablename]
-    HIndex_price_updater(tablename=tablename, filename=filename)
-
-    hi = HoldIndex()
-    hi.date = date_now
-    hi.content_note = file_str
-    db.session.add(hi)
-    db.session.commit()
-        
-    for item in HoldIndex.query.all():
-        print(item)
 
 @cli.command()
 def drop_single_dataset_table_manual():
@@ -489,177 +436,48 @@ def load_to_db():
 @timer
 def update_prices_ll():
     click.echo('updating leaders & laggard prices')
+
+    type1_list = ['fang+', 'soxx', 'retail', 'homies', 'kweb', 'PM', 'software-igv']
     
     init_table(t_name='lb_name')
-    type1='l_and_l'  
+    
+    for count, result in enumerate(ETFDB.query.all()):
+        print(count, result.type1)
 
-    db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
+    # db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
 
-    date_now = date.today()
-    tablename = type1 + '_' + str(date_now)
-    print(tablename)
-    tablename = db_set[tablename]
-    for item in ETFDB.query.filter_by(type1=type1).all():
-        type1 = item.type1
-        print(item.name, item.type1)
-        temp_listing = LBName()
-        temp_listing.name = item.name
-        try:                
-            price = yf.download(item.name, period='1y', interval='1wk')
-            current_price = price['Close'].tail(1).item()
-            lo52 = price['Close'].min()
-            hi52 = price['Close'].max()
-            gain_factor = current_price/lo52
-            off_hi = (current_price/hi52) -1
-            off_hi = off_hi * 100
-            print(temp_listing.name, current_price, gain_factor, off_hi)
-            tablename.insert(dict(name=temp_listing.name, off_hi=off_hi, gain_factor=gain_factor))
-        except Exception as e:
-            print(e, f'unable download ticker {temp_listing.name}')
+    # date_now = date.today()
+    # tablename = type1 + '_' + str(date_now)
+    # print(tablename)
+    # tablename = db_set[tablename]
+    # for item in ETFDB.query.filter_by(type1=type1).all():
+    #     type1 = item.type1
+    #     print(item.name, item.type1)
+    #     temp_listing = LBName()
+    #     temp_listing.name = item.name
+    #     try:                
+    #         price = yf.download(item.name, period='1y', interval='1wk')
+    #         current_price = price['Close'].tail(1).item()
+    #         lo52 = price['Close'].min()
+    #         hi52 = price['Close'].max()
+    #         gain_factor = current_price/lo52
+    #         off_hi = (current_price/hi52) -1
+    #         off_hi = off_hi * 100
+    #         print(temp_listing.name, current_price, gain_factor, off_hi)
+    #         tablename.insert(dict(name=temp_listing.name, off_hi=off_hi, gain_factor=gain_factor))
+    #     except Exception as e:
+    #         print(e, f'unable download ticker {temp_listing.name}')
  
-    hi = HoldIndex()
-    hi.date = date_now
-    hi.content_note = type1
-    db.session.add(hi)
-    db.session.commit()
-        
-
-
-
-
-
-
-
-
-
-    # index_builder_dev(filename=csv_file)
-    
-@cli.command()
-@timer
-def update_prices_fang():
-    click.echo('updating MEGACAP TECH prices')
-    
-    init_table(t_name='lb_name')
-
-    csv_file='index_components/fang_names.csv'
-    index_builder_dev(filename=csv_file)
+    # hi = HoldIndex()
+    # hi.date = date_now
+    # hi.content_note = type1
+    # db.session.add(hi)
+    # db.session.commit()
 
 @cli.command()
-@timer
-def update_prices_soxx():
-    click.echo('updating soxx prices')
+def update_leadership_board_button_func():
+    pass
 
-    init_table(t_name='lb_name')
-
-    csv_file='index_components/soxx.csv'
-    index_builder_dev(filename=csv_file)
-
-
-@cli.command()
-@timer
-def update_prices_homies():
-    click.echo('updating homies prices')
-
-    init_table(t_name='lb_name')
-
-    csv_file='index_components/itb.csv'
-    index_builder_dev(filename=csv_file)
-
-@cli.command()
-@timer
-def update_prices_mj():
-    click.echo('updating weed prices')
-
-    init_table(t_name='lb_name')
-
-    csv_file='index_components/mj.csv'
-    index_builder_dev(filename=csv_file)
-
-@cli.command()
-@timer
-def update_prices_retail():
-    click.echo('updating xrt prices')
-
-    init_table(t_name='lb_name')
-
-    csv_file='index_components/retail_xrt.csv'
-    index_builder_dev(filename=csv_file)
-
-@cli.command()
-@timer
-def update_prices_kweb():
-    click.echo('updating kweb prices')
-
-    init_table(t_name='lb_name')
-
-    csv_file='index_components/kweb.csv'
-    index_builder_dev(filename=csv_file)
-
-@cli.command()
-@timer
-def update_prices_igv():
-    click.echo('updating software prices')
-
-    init_table(t_name='lb_name')
-
-    csv_file='index_components/igv.csv'
-    index_builder_dev(filename=csv_file)
-
-
-
-@cli.command()
-@timer
-def update_prices_pm():
-    click.echo('updating precious metals (GDX) prices')
-
-    init_table(t_name='lb_name')
-    csv_file='index_components/gdx_names.csv'
-
-    with open(csv_file, encoding='utf-8') as csvf: 
-        #load csv file data using csv library's dictionary reader
-        csvReader = csv.DictReader(csvf) 
-
-        for count, row in enumerate(csvReader, 1):
-            item = LBName()
-            name = row['\ufeffname']
-            normalized_name = name.split(' ')
-            item.name = normalized_name[0]
-            print(item.name)
-            if normalized_name[1] == 'US':
-                try:
-                    price = yf.download(item.name, period='1y', interval='1wk')
-                    current_price = price['Close'].tail(1).item()
-                    lo52 = price['Close'].min()
-                    hi52 = price['Close'].max()
-                    gain_factor = current_price/lo52
-                    off_hi = (current_price/hi52) -1
-                    print(count, item.name, current_price, gain_factor, off_hi)
-                    item.gain_factor = gain_factor
-                    item.off_hi = off_hi
-                    item.current_price = current_price
-                    item.hi52 = hi52
-                    item.lo52 = lo52
-                    db.session.add(item)
-                    db.session.commit()
-                except Exception as e:
-                    print(e, f'unable download ticker {item.name}')
-
-    db.session.close()
-
-@cli.command()
-@timer
-def update_all():
-    click.echo('updating all')
-
-    update_prices_ll
-    update_prices_fang()
-    update_prices_soxx()
-    update_prices_mj()
-    update_prices_homies()
-    update_prices_retail()
-    update_prices_igv()
-    update_prices_kweb()
-    # update_prices_pm()
 
 @cli.command()
 def show_entries():
@@ -714,20 +532,8 @@ cli.add_command(show_entries)
 cli.add_command(topdown_build)
 cli.add_command(delete_entry)
 
-cli.add_command(update_prices_ll)
-
-cli.add_command(update_prices_fang)
-cli.add_command(update_prices_pm)
-cli.add_command(update_prices_soxx)
-cli.add_command(update_prices_homies)
-cli.add_command(update_prices_mj)
-cli.add_command(update_prices_retail)
-cli.add_command(update_prices_kweb)
-cli.add_command(update_all)
-
-
-
 cli.add_command(visualize)
+
 
 
 if __name__ == '__main__':

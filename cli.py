@@ -490,11 +490,8 @@ def load_to_db():
 def update_prices_ll():
     click.echo('updating leaders & laggard prices')
     
-    init_table(t_name='lb_name')  
-    
-    for item in ETFDB.query.filter_by(type1='l_and_l').all():
-        type1 = item.type1
-        print(item.name, item.type1)
+    init_table(t_name='lb_name')
+    type1='l_and_l'  
 
     db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
 
@@ -502,8 +499,24 @@ def update_prices_ll():
     tablename = type1 + '_' + str(date_now)
     print(tablename)
     tablename = db_set[tablename]
-    HIndex_price_updater(tablename=tablename, filename=filename)
-
+    for item in ETFDB.query.filter_by(type1=type1).all():
+        type1 = item.type1
+        print(item.name, item.type1)
+        temp_listing = LBName()
+        temp_listing.name = item.name
+        try:                
+            price = yf.download(item.name, period='1y', interval='1wk')
+            current_price = price['Close'].tail(1).item()
+            lo52 = price['Close'].min()
+            hi52 = price['Close'].max()
+            gain_factor = current_price/lo52
+            off_hi = (current_price/hi52) -1
+            off_hi = off_hi * 100
+            print(temp_listing.name, current_price, gain_factor, off_hi)
+            tablename.insert(dict(name=temp_listing.name, off_hi=off_hi, gain_factor=gain_factor))
+        except Exception as e:
+            print(e, f'unable download ticker {temp_listing.name}')
+ 
     hi = HoldIndex()
     hi.date = date_now
     hi.content_note = type1

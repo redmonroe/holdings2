@@ -415,10 +415,31 @@ def topdown_explore():
     topdown_presenter(result_list=comparison_list)
 
 @cli.command()
+def rates():
+    rates_list = ['spy', 'tlt', 'vug', 'vtv', 'iwm', 'xle', 'kre']
+
+    db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
+
+    # for item in rates_list:
+    t_name = 'spy' + ' ' + 'weekly5y'
+    tablename = db_set[t_name]
+    print(tablename)
+
+    price_series = yf.download('spy', period='1y', interval='1wk')
+    current_price = price_series['Close']
+
+    for item in current_price.iteritems():
+        print('price:', item[1], 'date:', item[0].date())
+        tablename.insert(dict(name=item, price=item[1], date=item[0].date()))
+
+
+
+@cli.command()
 @timer
 def load_to_db():
     from pathlib import Path
     import os
+
 
     try:
         type1 = str(input('Enter tag for etf or stocks we are entering: '))
@@ -433,48 +454,8 @@ def load_to_db():
         print(e)
 
 @cli.command()
-@timer
-def update_prices_ll():
-    click.echo('updating leaders & laggard prices')
-
-    type1_list = ['fang+', 'soxx', 'retail', 'homies', 'kweb', 'PM', 'software-igv']
-    
-    init_table(t_name='lb_name') 
-    
-    # db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
-
-    # date_now = date.today()
-    # tablename = type1 + '_' + str(date_now)
-    # print(tablename)
-    # tablename = db_set[tablename]
-    # for item in ETFDB.query.filter_by(type1=type1).all():
-    #     type1 = item.type1
-    #     print(item.name, item.type1)
-    #     temp_listing = LBName()
-    #     temp_listing.name = item.name
-    #     try:                
-    #         price = yf.download(item.name, period='1y', interval='1wk')
-    #         current_price = price['Close'].tail(1).item()
-    #         lo52 = price['Close'].min()
-    #         hi52 = price['Close'].max()
-    #         gain_factor = current_price/lo52
-    #         off_hi = (current_price/hi52) -1
-    #         off_hi = off_hi * 100
-    #         print(temp_listing.name, current_price, gain_factor, off_hi)
-    #         tablename.insert(dict(name=temp_listing.name, off_hi=off_hi, gain_factor=gain_factor))
-    #     except Exception as e:
-    #         print(e, f'unable download ticker {temp_listing.name}')
- 
-    # hi = HoldIndex()
-    # hi.date = date_now
-    # hi.content_note = type1
-    # db.session.add(hi)
-    # db.session.commit()
-
-@cli.command()
 def update_leadership_board_button_func():
     pass
-
 
 
 @cli.command()

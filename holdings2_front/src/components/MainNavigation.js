@@ -8,13 +8,16 @@ function MainNavigation() {
       <nav>
         <ul>
           <li>
-            <Link to='/'>hello world</Link>
+            <Link to='/'>home</Link>
           </li>
           <li>
             <Link to='/weekly'>week</Link>
           </li>
           <li>
             <Link to='/holdindex'>index</Link>
+          </li>
+          <li>
+            <Link to='/rates'>rates</Link>
           </li>
         </ul>
       </nav>

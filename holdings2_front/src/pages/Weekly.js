@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import WeeklyButton from "../components/WeeklyButton";
+import ShowRatesButton from "../components/ShowRatesButton";
 
 function Weekly() {
   const [isLoading, setIsLoading] = useState(true);
@@ -37,6 +38,8 @@ function Weekly() {
     <div>
       <h3>weekly scans</h3>
       <ul>{arrayItems}</ul>
+      <h3>rates</h3>
+      <ShowRatesButton>show rates</ShowRatesButton>
     </div>
   );
 }

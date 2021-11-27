@@ -98,10 +98,6 @@ class ETFDB(db.Model):
 
         db.session.close()
 
-
-
-
-
 '''routes'''
 
 @app.get('/')
@@ -139,8 +135,6 @@ def button_names():
     result_list = list(dict.fromkeys(result_list))
     return jsonify(result_list)
 
-
-
 @app.get('/wscan/<name>')
 def wscan(name=None):
     from cli import init_table
@@ -177,3 +171,22 @@ def wscan(name=None):
     db.session.commit()
 
     return jsonify(type1)
+
+@app.get('/rates')
+def rates():
+    db_dataset = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
+
+    for item in db_dataset.tables:
+        print(item)
+ 
+    # table_name = request.get_json(silent=True)
+
+    # for item in db_dataset.tables:
+    #     if item == table_name:
+    #         result = table_name
+
+    # results = db_dataset[result].all()
+    # result_list = [item for item in results]
+
+    return jsonify('hie')
+

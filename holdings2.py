@@ -175,17 +175,27 @@ def wscan(name=None):
 def rates():
     db_dataset = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
 
-    for item in db_dataset.tables:
-        print(item)
- 
-    # table_name = request.get_json(silent=True)
+    rates_list = ['tlt weekly5y ', 'gld weekly5y']
 
-    # for item in db_dataset.tables:
-    #     if item == table_name:
-    #         result = table_name
+    final_result_list = []
 
-    # results = db_dataset[result].all()
-    # result_list = [item for item in results]
+    def pull_series(series_name):
+        for item in db_dataset.tables:
+            if item == series_name:
+                table = item    
 
-    return jsonify('hie')
+        result = db_dataset[series_name].all()
+        result_list = [item for item in result]  
+
+        return series_name, result_list
+
+    for series_name in rates_list:
+        series_name2, result_list = pull_series(series_name)
+
+        for item in result_list:
+            dict1 = { 'name': series_name2, 'data': result_list}
+            final_result_list.append(dict1)
+
+
+    return jsonify(final_result_list)
 

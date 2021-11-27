@@ -415,24 +415,70 @@ def topdown_explore():
     topdown_presenter(result_list=comparison_list)
 
 @cli.command()
-def rates():
-    rates_list = ['spy', 'tlt', 'vug', 'vtv', 'iwm', 'xle', 'kre']
+def drop_rates_tables():
+    rates_list = ['spy', 'gld', 'tlt', 'vug', 'vtv', 'iwm', 'xle', 'kre']
+    relatives_list = ['vug/vtv', 'vug_to_vtv']
 
     db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
+    for item in db_set.tables:
+        print(item)
 
+@cli.command()
+def rates():
+    rates_list = ['spy', 'gld', 'tlt', 'vug', 'vtv', 'iwm', 'xle', 'kre']
+
+    db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
+    
+    #drop existing rate tables
     # for item in rates_list:
-    t_name = 'spy' + ' ' + 'weekly5y'
-    tablename = db_set[t_name]
-    print(tablename)
+    #     t_name = item + ' ' + 'weekly5y'
+    #     tablename = db_set[t_name]
+    #     tablename.drop()
 
-    price_series = yf.download('spy', period='1y', interval='1wk')
-    current_price = price_series['Close']
+    #drop relatives
+    
+    # get prices and set prices into dataset db
+    # for item in rates_list:
+    #     t_name = item + ' ' + 'weekly5y'
+    #     tablename = db_set[t_name]
+    #     price_series = yf.download(item, period='5y', interval='1wk')
+    #     current_price =   price_series['Close']
+    #     for item1 in current_price.iteritems():
+    #         print(item, 'price:', item1[1], 'date:', item1[0].date())
+    #         tablename.insert(dict(name=item, price=item1[1], date=item1[0].date()))
 
-    for item in current_price.iteritems():
-        print('price:', item[1], 'date:', item[0].date())
-        tablename.insert(dict(name=item, price=item[1], date=item[0].date()))
+    #do something with the relatives
+
+    #drop relatives
+    for item in rates_list:
+        t_name = item + ' ' + 'weekly5y'
+        tablename = db_set[t_name]
+        # tablename.drop()
+
+    #vug: vtv relative
+    for item in rates_list:
+        t_name = item + ' ' + 'weekly5y'
+        if t_name == 'vug weekly5y':
+            data = db_set[t_name].all()
+            vug_df = pd.DataFrame.from_dict(data)
+        if t_name == 'vtv weekly5y':
+            data = db_set[t_name].all()
+            vtv_df = pd.DataFrame.from_dict(data)
+
+    vug_to_vtv_price = vug_df['price']/vtv_df['price']
+    vug_to_vtv_date = vug_df['date']
+    for price, date in zip(vug_to_vtv_price, vug_to_vtv_date):
+        tablename = db_set['vug_to_vtv']
+        # print(tablename, 'price:', type(price), 'date:', type(date))
+        tablename.insert(dict(name=str(tablename), price=str(price), date=str(date)))
+
+    # spy: iwm
+    
 
 
+
+    # spy: xle, spy: kre
+        
 
 @cli.command()
 @timer

@@ -439,11 +439,8 @@ def update_prices_ll():
 
     type1_list = ['fang+', 'soxx', 'retail', 'homies', 'kweb', 'PM', 'software-igv']
     
-    init_table(t_name='lb_name')
+    init_table(t_name='lb_name') 
     
-    for count, result in enumerate(ETFDB.query.all()):
-        print(count, result.type1)
-
     # db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
 
     # date_now = date.today()
@@ -477,6 +474,7 @@ def update_prices_ll():
 @cli.command()
 def update_leadership_board_button_func():
     pass
+
 
 
 @cli.command()

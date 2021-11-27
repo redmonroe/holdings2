@@ -128,3 +128,15 @@ def lookup_index():
     result_list = [item for item in results]
 
     return jsonify(result_list)
+
+@app.get('/button_names')
+def button_names():
+    result = ETFDB.query.all()
+    result_list = [item.type1 for item in result]
+    result_list = list(dict.fromkeys(result_list))
+    return jsonify(result_list)
+
+
+
+# @app.get('/wscan/<name>')
+# def wscan(name=None):

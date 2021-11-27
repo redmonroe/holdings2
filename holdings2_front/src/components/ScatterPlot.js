@@ -13,9 +13,6 @@ import {
 function ScatterPlot({ incoming_data }) {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState();
-  // const [incomingData, setIncomingData] = useState();
-
-  // setIncomingData(incoming_data);
 
   useEffect(() => {
     setIsLoading(true);

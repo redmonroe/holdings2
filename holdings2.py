@@ -1,11 +1,14 @@
 from sqlalchemy import inspect
 from dataclasses import dataclass
 from sqlalchemy import inspect
+from datetime import date
 import dataset
 import os
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+import yfinance as yf
+
 from config import Config
 
 app = Flask(__name__)
@@ -138,5 +141,39 @@ def button_names():
 
 
 
-# @app.get('/wscan/<name>')
-# def wscan(name=None):
+@app.get('/wscan/<name>')
+def wscan(name=None):
+    from cli import init_table
+
+    init_table(t_name='lb_name')
+    
+    db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
+
+    type1 = name
+    date_now = date.today()
+    tablename = type1 + '_' + str(date_now)
+    print(tablename)
+    tablename = db_set[tablename]
+    for item in ETFDB.query.filter_by(type1=type1).all():
+        temp_listing = LBName()
+        temp_listing.name = item.name
+        try:                
+            price = yf.download(item.name, period='1y', interval='1wk')
+            current_price = price['Close'].tail(1).item()
+            lo52 = price['Close'].min()
+            hi52 = price['Close'].max()
+            gain_factor = current_price/lo52
+            off_hi = (current_price/hi52) -1
+            off_hi = off_hi * 100
+            print(temp_listing.name, current_price, gain_factor, off_hi)
+            tablename.insert(dict(name=temp_listing.name, off_hi=off_hi, gain_factor=gain_factor))
+        except Exception as e:
+            print(e, f'unable download ticker {temp_listing.name}')
+ 
+    hi = HoldIndex()
+    hi.date = date_now
+    hi.content_note = type1
+    db.session.add(hi)
+    db.session.commit()
+
+    return jsonify(type1)

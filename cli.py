@@ -123,9 +123,18 @@ def price_updater(filename=None):
 def cli():
     pass
 
+'''db utils'''
+
 @cli.command()
-def config_test():
-    print(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
+def dump_dbs():
+    from datetime import datetime as dt
+    import os
+    bu_time = dt.now()
+    print(Config.PG_DUMPS_URI1, Config.DB_BACKUPS)
+    print(Config.PG_DUMPS_URI2, Config.DB_BACKUPS)
+    os.system(f'pg_dump --dbname={Config.PG_DUMPS_URI1} > "./db_backups/holdings2_index_of_scansdb_dump{bu_time.month}{bu_time.day}{bu_time.year}{bu_time.hour}.sql"')
+    os.system(f'pg_dump --dbname={Config.PG_DUMPS_URI2} > "./db_backups/holdings2_maindb_dump{bu_time.month}{bu_time.day}{bu_time.year}{bu_time.hour}.sql"')
+    print(bu_time, 'dumping db to /db_backups')
 
 @cli.command()
 def database_test():
@@ -154,7 +163,7 @@ def database_test():
     # db.drop_all()
 
     # result = LBName.query.all()
-    for count, item in enumerate(LBName.query.all(), 1):
+    for count, item in enumerate(LBName.query.all(), 2):
         print(count, item)
         if count == 5:
             break

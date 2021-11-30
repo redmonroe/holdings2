@@ -183,14 +183,30 @@ def backup():
     print(bu_time, 'dumping db to /db_backups')
 
     return jsonify(str(bu_time))
-    
+
 @app.get('/rates')
 def rates():
     db_dataset = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
 
-    rates_list = ['tlt weekly5y ', 'gld weekly5y']
+    # rates_list = ['tlt weekly5y ', 'gld weekly5y']
+    # rates_list = ['tlt weekly5y ']
+    rates_list = ['gld weekly5y ']
 
     final_result_list = []
+
+    # def pull_one_series(series=None):
+    #     for tab in db_dataset.tables:
+    #         print(tab)
+    #         if tab == series:
+    #             table = tab
+
+    #     print(table)
+
+    # for item in rates_list:
+    #     pull_one_series(series=item)
+
+
+    '''pull multiple series'''
 
     def pull_series(series_name):
         for item in db_dataset.tables:
@@ -205,9 +221,15 @@ def rates():
     for series_name in rates_list:
         series_name2, result_list = pull_series(series_name)
 
+
         for item in result_list:
-            dict1 = { 'name': series_name2, 'data': result_list}
+            dict1 = {'data': result_list}
             final_result_list.append(dict1)
+            break
+
+    print(final_result_list)
+        
+  
 
 
     return jsonify(final_result_list)

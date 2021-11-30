@@ -443,15 +443,17 @@ def show_rates_tables():
 @cli.command()
 def rates():
     rates_list = ['spy', 'gld', 'tlt', 'vug', 'vtv', 'iwm', 'xle', 'kre']
+    # rates_list = ['spy']
 
     db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
      
     # get prices and set prices into dataset db
-    ### deal with nans
+
     for item in rates_list:
         t_name = item + ' ' + 'weekly5y'
         tablename = db_set[t_name]
         price_series = yf.download(item, period='5y', interval='1wk')
+        price_series = price_series.fillna(method='pad')  ## deals with nans ok
         current_price =   price_series['Close']
         for item1 in current_price.iteritems():
             print(item, 'price:', item1[1], 'date:', item1[0].date())

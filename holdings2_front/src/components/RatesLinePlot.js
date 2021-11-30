@@ -7,7 +7,7 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer,
+  // ResponsiveContainer,
 } from "recharts";
 
 function RatesLinePlot() {
@@ -21,7 +21,7 @@ function RatesLinePlot() {
       .then((result) => result.json())
       .then((data) => {
         setData(data);
-        console.log("rates.js:", data, typeof data);
+        console.log("rates.js:", data[0]["data"], typeof data);
       })
       .catch((err) => {
         console.log(err);
@@ -57,24 +57,30 @@ function RatesLinePlot() {
   return (
     <div>
       <p>Rate-Sensitive</p>
-      {/* <LineChart
-        width={500}
-        height={500}
-        data={data}
+      <LineChart
+        width={800}
+        height={600}
+        data={data[0]["data"]}
         margin={{
           top: 5,
           right: 30,
           left: 20,
           bottom: 5,
         }}
-      > */}
-      {/* <XAxis dataKey='date' />
-        <YAxis />
+      >
+        <CartesianGrid strokeDasharray='9 9' />
+        <XAxis dataKey='date' />
+        <YAxis dataKey='price' />
         <Tooltip />
         <Legend />
-        <Line type='monotone' dataKey='price' stroke='#8884d8' dot={false} />
-        <Line type='linear' dataKey='vug:vtv' stroke='#82ca9d' />
-      </LineChart> */}
+        {/* <Line
+          type='monotone'
+          dataKey='pv'
+          stroke='#8884d8'
+          // activeDot={{ r: 8 }}
+        /> */}
+        <Line type='monotone' dataKey='tlt' stroke='#8884d8' />
+      </LineChart>
     </div>
   );
 }

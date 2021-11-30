@@ -183,6 +183,7 @@ def backup():
     print(bu_time, 'dumping db to /db_backups')
 
     return jsonify(str(bu_time))
+    
 @app.get('/rates')
 def rates():
     db_dataset = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)

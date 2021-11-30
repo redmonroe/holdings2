@@ -183,6 +183,8 @@ def drop_single_dataset_table_manual():
     table = db_set['index_components/fang_names.csv_<class datetime.date>']
     table.drop()
 
+'''topdown funcs'''
+
 @cli.command()
 def topdown_drop_priceset():
     click.echo('drop timeseries data for topdown')
@@ -423,6 +425,8 @@ def topdown_explore():
 
     topdown_presenter(result_list=comparison_list)
 
+'''rates & leadership board funcs'''
+
 @cli.command()
 def drop_rates_tables():
     rates_list = ['spy', 'gld', 'tlt', 'vug', 'vtv', 'iwm', 'xle', 'kre']
@@ -503,7 +507,6 @@ def rates():
 def load_to_db():
     from pathlib import Path
     import os
-
 
     try:
         type1 = str(input('Enter tag for etf or stocks we are entering: '))

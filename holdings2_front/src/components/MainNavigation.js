@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import classes from "./MainNavigation.module.css";
 
+import BackupButton from "./BackupButton";
+
 function MainNavigation() {
   return (
     <header className={classes.header}>
@@ -18,6 +20,9 @@ function MainNavigation() {
           </li>
           <li>
             <Link to='/rates'>rates</Link>
+          </li>
+          <li>
+            <BackupButton>backup</BackupButton>
           </li>
         </ul>
       </nav>

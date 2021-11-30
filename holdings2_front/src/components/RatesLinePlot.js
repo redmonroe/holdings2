@@ -57,7 +57,7 @@ function RatesLinePlot() {
   return (
     <div>
       <p>Rate-Sensitive</p>
-      <LineChart
+      {/* <LineChart
         width={500}
         height={500}
         data={data}
@@ -67,15 +67,14 @@ function RatesLinePlot() {
           left: 20,
           bottom: 5,
         }}
-      >
-        {/* <CartesianGrid strokeDasharray='3 3' /> */}
-        <XAxis dataKey='date' />
+      > */}
+      {/* <XAxis dataKey='date' />
         <YAxis />
         <Tooltip />
         <Legend />
         <Line type='monotone' dataKey='price' stroke='#8884d8' dot={false} />
-        {/* <Line type='linear' dataKey='vug:vtv' stroke='#82ca9d' /> */}
-      </LineChart>
+        <Line type='linear' dataKey='vug:vtv' stroke='#82ca9d' />
+      </LineChart> */}
     </div>
   );
 }

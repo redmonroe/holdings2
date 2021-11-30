@@ -32,7 +32,7 @@ function Weekly() {
   }
 
   const arrayItems = data.map((name1) => (
-    <WeeklyButton name={name1}></WeeklyButton>
+    <WeeklyButton key={name1} name={name1}></WeeklyButton>
   ));
   return (
     <div>

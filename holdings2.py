@@ -171,6 +171,18 @@ def wscan(name=None):
 
     return jsonify(type1)
 
+@app.get('/backup')
+def backup():
+    from datetime import datetime as dt
+    import os
+    bu_time = dt.now()
+    print(Config.PG_DUMPS_URI1, Config.DB_BACKUPS)
+    print(Config.PG_DUMPS_URI2, Config.DB_BACKUPS)
+    os.system(f'pg_dump --dbname={Config.PG_DUMPS_URI1} > "./db_backups/holdings2_index_of_scansdb_dump{bu_time.month}{bu_time.day}{bu_time.year}{bu_time.hour}.sql"')
+    os.system(f'pg_dump --dbname={Config.PG_DUMPS_URI2} > "./db_backups/holdings2_maindb_dump{bu_time.month}{bu_time.day}{bu_time.year}{bu_time.hour}.sql"')
+    print(bu_time, 'dumping db to /db_backups')
+
+    return jsonify(str(bu_time))
 @app.get('/rates')
 def rates():
     db_dataset = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)

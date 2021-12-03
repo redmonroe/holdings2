@@ -186,13 +186,52 @@ def backup():
 
 @app.get('/rates')
 def rates():
+    import pprint
     db_dataset = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
 
+    '''
+    series =  [{
+        name: "tlt whatever",
+        data: [
+        { category: "A", value: Math.random() },
+        { category: "B", value: Math.random() },
+        { category: "C", value: Math.random() },
+        ],
+    }]
+    '''
     # rates_list = ['tlt weekly5y ', 'gld weekly5y']
     # rates_list = ['tlt weekly5y ']
-    rates_list = ['gld weekly5y ']
+    rates_list = ['gld weekly5y']
 
-    final_result_list = []
+    print(rates_list)
+
+
+    #get 'name'
+    for table in db_dataset.tables:
+        if str(table) == rates_list[0]:
+            name = rates_list[0]
+
+    #get data
+    result = db_dataset[name].all()
+    
+    data_list = []
+    for item in result:
+        # print(item['name'])
+        dict1 = {}
+        dict1['price'] = item['price']
+        dict1['date'] = item['date']
+        data_list.append(dict1) 
+    
+    # pprint.pprint(data_list[0:10])
+
+    data_dict = {
+        'name': name, 
+        'data': data_list
+    }
+    
+    pprint.pprint(data_dict)    
+    
+    final_result_list = [data_dict]
 
     # def pull_one_series(series=None):
     #     for tab in db_dataset.tables:
@@ -208,29 +247,26 @@ def rates():
 
     '''pull multiple series'''
 
-    def pull_series(series_name):
-        for item in db_dataset.tables:
-            if item == series_name:
-                table = item    
+    # def pull_series(series_name):
+    #     for item in db_dataset.tables:
+    #         if item == series_name:
+    #             table = item    
 
-        result = db_dataset[series_name].all()
-        result_list = [item for item in result]  
+    #     result = db_dataset[series_name].all()
+    #     result_list = [item for item in result]  
 
-        return series_name, result_list
+    #     return series_name, result_list
 
-    for series_name in rates_list:
-        series_name2, result_list = pull_series(series_name)
+    # for series_name in rates_list:
+    #     series_name2, result_list = pull_series(series_name)
 
 
-        for item in result_list:
-            dict1 = {'data': result_list}
-            final_result_list.append(dict1)
-            break
+    #     for item in result_list:
+    #         dict1 = {'data': result_list}
+    #         final_result_list.append(dict1)
+    #         break
 
-    print(final_result_list)
-        
-  
-
+    # print(final_result_list)
 
     return jsonify(final_result_list)
 

@@ -448,7 +448,6 @@ def rates():
     db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
      
     # get prices and set prices into dataset db
-
     for item in rates_list:
         t_name = item + ' ' + 'weekly5y'
         tablename = db_set[t_name]

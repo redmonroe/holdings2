@@ -418,7 +418,7 @@ def topdown_explore():
 @cli.command()
 def drop_rates_tables():
     rates_list = ['spy', 'gld', 'tlt', 'vug', 'vtv', 'iwm', 'xle', 'kre']
-    relatives_list = ['vug/vtv', 'vug_to_vtv']
+    relatives_list = ['vug_to_vtv', 'spy_to_iwm', 'spy_to_xle', 'spy_to_kre']
 
     db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
     for item in db_set.tables:
@@ -442,12 +442,33 @@ def show_rates_tables():
 
 @cli.command()
 def rates():
+
+    def build_relative(rates_list, table1=None, table2=None, series_name=None, adjustment_factor=None):
+        for item in rates_list:
+            t_name = item + ' ' + 'weekly5y'
+            if t_name == table1:
+                data = db_set[t_name].all()
+                df1 = pd.DataFrame.from_dict(data)
+                df1 = df1.fillna(method='pad')
+            if t_name == table2:
+                data = db_set[t_name].all()
+                df2 = pd.DataFrame.from_dict(data)
+                df2 = df2.fillna(method='pad')
+
+        rel_price = df1['price']/df2['price']
+        rel_date = df1['date']
+        for price, date in zip(rel_price, rel_date):
+            tablename = db_set[series_name]
+            print(tablename, 'price:', price * adjustment_factor, 'date:', date)
+            tablename.insert(dict(name=str(series_name), price=str(price * adjustment_factor), date=str(date)))
+
     rates_list = ['spy', 'gld', 'tlt', 'vug', 'vtv', 'iwm', 'xle', 'kre']
     # rates_list = ['spy']
 
     db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
+    # drop_rates_tables()
      
-    # get prices and set prices into dataset db
+    '''get prices and set prices into dataset db'''
     for item in rates_list:
         t_name = item + ' ' + 'weekly5y'
         tablename = db_set[t_name]
@@ -458,37 +479,19 @@ def rates():
             print(item, 'price:', item1[1], 'date:', item1[0].date())
             tablename.insert(dict(name=item, price=item1[1], date=item1[0].date()))
 
-    #relatives
+    '''relatives'''
 
-    # #vug: vtv relative
-    # series_name = 'vug_to_vtv'
-    # for item in rates_list:
-    #     t_name = item + ' ' + 'weekly5y'
-    #     if t_name == 'vug weekly5y':
-    #         data = db_set[t_name].all()
-    #         vug_df = pd.DataFrame.from_dict(data)
-    #         vug_df = vug_df.fillna(method='pad')
-    #     if t_name == 'vtv weekly5y':
-    #         data = db_set[t_name].all()
-    #         vtv_df = pd.DataFrame.from_dict(data)
-    #         vtv_df = vtv_df.fillna(method='pad')
+    '''vug: vtv relative'''
+    build_relative(rates_list, table1='vug weekly5y', table2='vtv weekly5y', series_name='vug_to_vtv', adjustment_factor=100)
 
-    # vug_to_vtv_price = vug_df['price']/vtv_df['price']
-    # vug_to_vtv_date = vug_df['date']
-    # for price, date in zip(vug_to_vtv_price, vug_to_vtv_date):
-    #     tablename = db_set[series_name]
-    #     print(tablename, 'price:', price, 'date:', date)
-    #     tablename.insert(dict(name=str(series_name), price=str(price), date=str(date)))
-
-
-
-
-    # spy: iwm
+    '''spy: iwm'''
+    build_relative(rates_list, table1='spy weekly5y', table2='iwm weekly5y', series_name='spy_to_iwm', adjustment_factor=100)
     
-
-
-
-    # spy: xle, spy: kre
+    '''spy: xle'''
+    build_relative(rates_list, table1='spy weekly5y', table2='xle weekly5y', series_name='spy_to_xle', adjustment_factor=50)
+    
+    '''spy: kre'''
+    build_relative(rates_list, table1='spy weekly5y', table2='kre weekly5y', series_name='spy_to_kre', adjustment_factor=50)
         
 
 @cli.command()

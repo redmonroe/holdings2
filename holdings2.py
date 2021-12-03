@@ -199,74 +199,57 @@ def rates():
         ],
     }]
     '''
-    # rates_list = ['tlt weekly5y ', 'gld weekly5y']
-    # rates_list = ['tlt weekly5y ']
-    rates_list = ['gld weekly5y']
+    rates_list = [
+                    'tlt weekly5y', 
+                    'gld weekly5y', 
+                    'vug_to_vtv',   
+                    'spy_to_iwm',
+                    'spy_to_xle',
+                    'spy_to_kre', 
+                    'spy weekly5y'
+                    ]
+
+    # rates_list = ['tlt weekly5y']
+    # rates_list = ['gld weekly5y']
 
     print(rates_list)
 
+    def rates_wrapper(name=None):
+        result = db_dataset[name].all()
 
-    #get 'name'
+
+        data_list = []
+        for item in result:
+          data_list.append(item) 
+
+        data_list = data_list[:250]
+        print(name, len(data_list))
+
+
+        # data_list = []
+        # for item in result:
+        #     dict1 = {}
+        #     dict1['price'] = item['price']
+        #     dict1['date'] = item['date']
+        #     data_list.append(dict1) 
+
+        data_dict = {
+            'name': name, 
+            'data': data_list
+        }
+
+        # pprint.pprint(data_dict)    
+
+        final_result_list.append(data_dict)
+
+    final_result_list = []
     for table in db_dataset.tables:
-        if str(table) == rates_list[0]:
-            name = rates_list[0]
+        # print(table)
+        for i in range(len(rates_list)):
+            if str(table) == rates_list[i]:
+                name = rates_list[i]
+                rates_wrapper(name=name)
 
-    #get data
-    result = db_dataset[name].all()
     
-    data_list = []
-    for item in result:
-        # print(item['name'])
-        dict1 = {}
-        dict1['price'] = item['price']
-        dict1['date'] = item['date']
-        data_list.append(dict1) 
-    
-    # pprint.pprint(data_list[0:10])
-
-    data_dict = {
-        'name': name, 
-        'data': data_list
-    }
-    
-    pprint.pprint(data_dict)    
-    
-    final_result_list = [data_dict]
-
-    # def pull_one_series(series=None):
-    #     for tab in db_dataset.tables:
-    #         print(tab)
-    #         if tab == series:
-    #             table = tab
-
-    #     print(table)
-
-    # for item in rates_list:
-    #     pull_one_series(series=item)
-
-
-    '''pull multiple series'''
-
-    # def pull_series(series_name):
-    #     for item in db_dataset.tables:
-    #         if item == series_name:
-    #             table = item    
-
-    #     result = db_dataset[series_name].all()
-    #     result_list = [item for item in result]  
-
-    #     return series_name, result_list
-
-    # for series_name in rates_list:
-    #     series_name2, result_list = pull_series(series_name)
-
-
-    #     for item in result_list:
-    #         dict1 = {'data': result_list}
-    #         final_result_list.append(dict1)
-    #         break
-
-    # print(final_result_list)
-
     return jsonify(final_result_list)
 

@@ -70,23 +70,6 @@ function RatesLinePlot() {
   return (
     <div>
       <p>Rate-Sensitive</p>
-      <LineChart width={500} height={300} data={data}>
-        <CartesianGrid strokeDasharray='3 3' />
-        <XAxis dataKey='date' />
-        {/* allowDuplicatedCategory={false} */}
-        <YAxis dataKey='price' />
-        <Tooltip />
-        <Legend />
-        {data.map((s) => (
-          <Line
-            dataKey='price'
-            data={s.data}
-            name={s.name}
-            key={s.name}
-            dot={false}
-          />
-        ))}
-      </LineChart>
     </div>
   );
 }

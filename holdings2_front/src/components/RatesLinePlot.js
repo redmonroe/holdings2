@@ -6,6 +6,7 @@ import {
   ChartLabel,
   HorizontalGridLines,
   VerticalGridLines,
+  LineMarkSeries,
   LineSeries,
   LineSeriesCanvas,
 } from "react-vis";
@@ -13,9 +14,9 @@ import {
 function RatesLinePlot() {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState();
-  const [useCanvas, setUseCanvas] = useState("false");
-  const content = useCanvas ? "TOGGLE TO SVG" : "TOGGLE TO CANVAS";
-  const Line = useCanvas ? LineSeriesCanvas : LineSeries;
+  // const [useCanvas, setUseCanvas] = useState(true);
+  // const content = useCanvas ? "TOGGLE TO SVG" : "TOGGLE TO CANVAS";
+  // const Line = useCanvas ? LineSeriesCanvas : LineSeries;
 
   useEffect(() => {
     setIsLoading(true);
@@ -23,7 +24,7 @@ function RatesLinePlot() {
     fetch("/rates")
       .then((result) => result.json())
       .then((data) => {
-        // setData(data);
+        setData(data);
         console.log("rates.js:", data, typeof data);
       })
       .catch((err) => {
@@ -45,24 +46,36 @@ function RatesLinePlot() {
   return (
     <div>
       {/* <p>Rate-Sensitive</p> */}
-      <XYPlot width={750} height={750}>
-        <LineSeries
+      <XYPlot width={800} height={800} xType='ordinal'>
+        <LineMarkSeries
           className='first-series'
-          data={[
-            { x: 1, y: 10 },
-            { x: 2, y: 15 },
-          ]}
+          data={data}
+          // curve={"curveMonotoneX"}
+          lineStyle={{ stroke: "#e0e0e0" }}
+          markStyle={{ stroke: "#6dc6c1" }}
+          // style={{ strokeWidth: "2px" }}
+          strokeStyle='solid'
+          style={{ fill: "none" }}
         />
-        <LineSeries
-          className='first-series'
+
+        {/* <LineSeries
+          className='second-series'
           data={[
             { x: 3, y: 5 },
             { x: 4, y: 6 },
-          ]}
-        />
+          ]} */}
         <HorizontalGridLines />
         <VerticalGridLines />
-        <XAxis />
+        <XAxis
+          attr='x'
+          attrAxis='y'
+          orientation='bottom'
+          // tickFormat={function tickFormat(d) {
+          //   return;
+          //   moment(d).format("YY MM");
+          // }}
+          tickLabelAngle={90}
+        />
         <YAxis />
         <ChartLabel
           text='date'
@@ -77,15 +90,14 @@ function RatesLinePlot() {
           includeMargin={false}
           xPercent={0.06}
           yPercent={0.06}
-          style={{
-            transform: "rotate(-90)",
-            textAnchor: "end",
-          }}
+          // style={{
+          //   transform: "rotate(-90)",
+          //   textAnchor: "end",
+          // }}
         />
         {/* <Line className='second-series' data={data} /> */}
         {/* <Line
           className='third-series'
-          curve={"curveMonotoneX"}
           data={[
             { x: 1, y: 10 },
             { x: 2, y: 4 },

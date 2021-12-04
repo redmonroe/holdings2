@@ -63,7 +63,7 @@ function ScatterPlot({ incoming_data }) {
     <div>
       <p>ScatterChart {incoming_data}</p>
       {/* <ResponsiveContainer> */}
-      <ScatterChart width={3000} height={800}>
+      <ScatterChart width={3000} height={800} allowDataOverflow={true}>
         <CartesianGrid />
         <XAxis type='number' dataKey='x' domain={[1, 4]} />
         <YAxis type='number' dataKey='y' domain={[-100, 0]} />

@@ -459,11 +459,11 @@ def rates():
         rel_date = df1['date']
         for price, date in zip(rel_price, rel_date):
             tablename = db_set[series_name]
-            print(tablename, 'price:', price * adjustment_factor, 'date:', date)
-            tablename.insert(dict(name=str(series_name), price=str(price * adjustment_factor), date=str(date)))
+            print(tablename, 'price:', price * adjustment_factor, 'date:', date.date())
+            tablename.insert(dict(name=str(series_name), price=str(round(price * adjustment_factor, 2)), date=str(date)))
 
-    rates_list = ['spy', 'gld', 'tlt', 'vug', 'vtv', 'iwm', 'xle', 'kre']
-    # rates_list = ['spy']
+    # rates_list = ['spy', 'gld', 'tlt', 'vug', 'vtv', 'iwm', 'xle', 'kre']
+    rates_list = ['tlt']
 
     db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
     # drop_rates_tables()
@@ -476,22 +476,22 @@ def rates():
         price_series = price_series.fillna(method='pad')  ## deals with nans ok
         current_price =   price_series['Close']
         for item1 in current_price.iteritems():
-            print(item, 'price:', item1[1], 'date:', item1[0].date())
-            tablename.insert(dict(name=item, price=item1[1], date=item1[0].date()))
+            print(item, 'price:', round(item1[1], 2), 'date:', item1[0].date())
+            tablename.insert(dict(name=item, price=round(item1[1], 2), date=str(item1[0].date())))
 
     '''relatives'''
 
     '''vug: vtv relative'''
-    build_relative(rates_list, table1='vug weekly5y', table2='vtv weekly5y', series_name='vug_to_vtv', adjustment_factor=100)
+    # build_relative(rates_list, table1='vug weekly5y', table2='vtv weekly5y', series_name='vug_to_vtv', adjustment_factor=100)
 
     '''spy: iwm'''
-    build_relative(rates_list, table1='spy weekly5y', table2='iwm weekly5y', series_name='spy_to_iwm', adjustment_factor=100)
+    # build_relative(rates_list, table1='spy weekly5y', table2='iwm weekly5y', series_name='spy_to_iwm', adjustment_factor=100)
     
     '''spy: xle'''
-    build_relative(rates_list, table1='spy weekly5y', table2='xle weekly5y', series_name='spy_to_xle', adjustment_factor=50)
+    # build_relative(rates_list, table1='spy weekly5y', table2='xle weekly5y', series_name='spy_to_xle', adjustment_factor=50)
     
     '''spy: kre'''
-    build_relative(rates_list, table1='spy weekly5y', table2='kre weekly5y', series_name='spy_to_kre', adjustment_factor=50)
+    # build_relative(rates_list, table1='spy weekly5y', table2='kre weekly5y', series_name='spy_to_kre', adjustment_factor=50)
         
 
 @cli.command()

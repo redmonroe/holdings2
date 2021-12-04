@@ -189,24 +189,19 @@ def rates():
     import pprint
     db_dataset = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
 
+    '''react-vis'''
     '''
-    series =  [{
-        name: "tlt whatever",
-        data: [
-        { category: "A", value: Math.random() },
-        { category: "B", value: Math.random() },
-        { category: "C", value: Math.random() },
-        ],
-    }]
+    [{x: 1, y: 3}, {x: 2, y: 5}, {x: 3, y: 15}, {x: 4, y: 12}]
     '''
+
     rates_list = [
                     'tlt weekly5y', 
-                    'gld weekly5y', 
-                    'vug_to_vtv',   
-                    'spy_to_iwm',
-                    'spy_to_xle',
-                    'spy_to_kre', 
-                    'spy weekly5y'
+                    # 'gld weekly5y', 
+                    # 'vug_to_vtv',   
+                    # 'spy_to_iwm',
+                    # 'spy_to_xle',
+                    # 'spy_to_kre', 
+                    # 'spy weekly5y'
                     ]
 
     # rates_list = ['tlt weekly5y']
@@ -214,41 +209,47 @@ def rates():
 
     print(rates_list)
 
-    def rates_wrapper(name=None):
+    def recharts_rates_wrapper(name=None):
         result = db_dataset[name].all()
-
 
         data_list = []
         for item in result:
           data_list.append(item) 
 
-        data_list = data_list[:250]
-        print(name, len(data_list))
-
-
-        # data_list = []
-        # for item in result:
-        #     dict1 = {}
-        #     dict1['price'] = item['price']
-        #     dict1['date'] = item['date']
-        #     data_list.append(dict1) 
-
-        data_dict = {
-            'name': name, 
-            'data': data_list
-        }
-
         # pprint.pprint(data_dict)    
 
         final_result_list.append(data_dict)
 
-    final_result_list = []
-    for table in db_dataset.tables:
-        # print(table)
-        for i in range(len(rates_list)):
-            if str(table) == rates_list[i]:
-                name = rates_list[i]
-                rates_wrapper(name=name)
+    def react_vis_wrapper(name=None):
+        result = db_dataset[name].all()
+        data_list = []
+        for item in result:
+            dict1 = {}
+            dict1['x'] = item['date']
+            # dict1['x'] = 10
+            dict1['y'] = item['price']
+            data_list.append(dict1) 
+
+        data_list = data_list[275:]
+
+        print(name, len(data_list))
+        pprint.pprint(data_list)    
+
+        return data_list
+        # data_dict = {
+        #     'name': name, 
+        #     'data': data_list
+        # }
+
+    # final_result_list = []
+    # for table in db_dataset.tables:
+    #     # print(table)
+    #     for i in range(len(rates_list)):
+    #         if str(table) == rates_list[i]:
+    #             name = rates_list[i]
+    #             react_vis_wrapper(name=name)
+
+    final_result_list = react_vis_wrapper(name=rates_list[0])
 
     
     return jsonify(final_result_list)

@@ -6,6 +6,7 @@ import HoldIndex from "./pages/HoldIndex";
 import PlotA from "./pages/PlotA";
 import Weekly from "./pages/Weekly";
 import Rates from "./pages/Rates";
+import Indices from "./pages/Indices";
 
 import MainNavigation from "./components/MainNavigation";
 
@@ -19,6 +20,7 @@ const App = () => {
         <Route path='/holdindex' element={<HoldIndex />} />
         <Route path='/weekly' element={<Weekly />} />
         <Route path='/rates' element={<Rates />} />
+        <Route path='/indices' element={<Indices />} />
       </Routes>
     </div>
   );

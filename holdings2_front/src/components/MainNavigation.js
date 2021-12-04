@@ -13,6 +13,9 @@ function MainNavigation() {
             <Link to='/'>home</Link>
           </li>
           <li>
+            <Link to='/indices'>indices</Link>
+          </li>
+          <li>
             <Link to='/weekly'>week</Link>
           </li>
           <li>

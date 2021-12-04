@@ -413,6 +413,32 @@ def topdown_explore():
 
     topdown_presenter(result_list=comparison_list)
 
+    '''key levels'''
+
+    indices = [
+            "spx", 
+            "dia",
+            "qqq",
+            "iyt", 
+            "mdy", 
+            "iwm", 
+            "iwc",
+            "rsp",
+            "soxx", 
+            ]
+
+    for item in indices:
+            t_name = item + ' ' + 'weekly5y'
+            tablename = db_set[t_name]
+            price_series = yf.download(item, period='5y', interval='1wk')
+            price_series = price_series.fillna(method='pad')  ## deals with nans ok
+            current_price =   price_series['Close']
+            # for item1 in current_price.iteritems():
+            #     print(item, 'price:', round(item1[1], 2), 'date:', item1[0].date())
+            #     tablename.insert(dict(name=item, price=round(item1[1], 2), date=str(item1[0].date())))
+
+
+
 '''rates & leadership board funcs'''
 
 @cli.command()
@@ -427,7 +453,6 @@ def drop_rates_tables():
     for item in relatives_list:
         table = db_set[item]
         table.drop()
-
 
     for item in rates_list:
         name = item + ' ' + 'weekly5y'

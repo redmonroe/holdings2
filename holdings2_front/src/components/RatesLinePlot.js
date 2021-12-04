@@ -43,39 +43,43 @@ function RatesLinePlot() {
     );
   }
 
+  // function Transform() {
+
+  // }
+
+  // Transform();
+
   return (
     <div>
-      {/* <p>Rate-Sensitive</p> */}
-      <XYPlot width={800} height={800} xType='ordinal'>
+      <p>Rate-Sensitive</p>
+      <XYPlot width={500} height={500} xType='ordinal'>
         <LineMarkSeries
           className='first-series'
-          data={data}
-          // curve={"curveMonotoneX"}
+          data={data[0]}
           lineStyle={{ stroke: "#e0e0e0" }}
-          markStyle={{ stroke: "#6dc6c1" }}
-          // style={{ strokeWidth: "2px" }}
+          markStyle={{ stroke: "none" }}
           strokeStyle='solid'
           style={{ fill: "none" }}
         />
-
-        {/* <LineSeries
+        <LineMarkSeries
           className='second-series'
-          data={[
-            { x: 3, y: 5 },
-            { x: 4, y: 6 },
-          ]} */}
+          data={data[1]}
+          lineStyle={{ stroke: "blue" }}
+          markStyle={{ stroke: "none" }}
+          strokeStyle='solid'
+          style={{ fill: "none" }}
+        />
+        <LineMarkSeries
+          className='third-series'
+          data={data[2]}
+          lineStyle={{ stroke: "blue" }}
+          markStyle={{ stroke: "none" }}
+          strokeStyle='solid'
+          style={{ fill: "none" }}
+        />
         <HorizontalGridLines />
         <VerticalGridLines />
-        <XAxis
-          attr='x'
-          attrAxis='y'
-          orientation='bottom'
-          // tickFormat={function tickFormat(d) {
-          //   return;
-          //   moment(d).format("YY MM");
-          // }}
-          tickLabelAngle={90}
-        />
+        <XAxis attr='x' attrAxis='y' orientation='bottom' tickLabelAngle={90} />
         <YAxis />
         <ChartLabel
           text='date'
@@ -90,36 +94,11 @@ function RatesLinePlot() {
           includeMargin={false}
           xPercent={0.06}
           yPercent={0.06}
-          // style={{
-          //   transform: "rotate(-90)",
-          //   textAnchor: "end",
-          // }}
-        />
-        {/* <Line className='second-series' data={data} /> */}
-        {/* <Line
-          className='third-series'
-          data={[
-            { x: 1, y: 10 },
-            { x: 2, y: 4 },
-            { x: 3, y: 2 },
-            { x: 4, y: 15 },
-          ]}
-          strokeDasharray={useCanvas ? [7, 3] : "7, 3"}
-        />
-        <Line
-          className='fourth-series'
-          curve={"curveMonotoneX"}
           style={{
-            // note that this can not be translated to the canvas version
-            strokeDasharray: "2 2",
+            transform: "rotate(-90)",
+            textAnchor: "end",
           }}
-          data={[
-            { x: 1, y: 7 },
-            { x: 2, y: 11 },
-            { x: 3, y: 9 },
-            { x: 4, y: 2 },
-          ]} */}
-        {/* /> */}
+        />
       </XYPlot>
     </div>
   );

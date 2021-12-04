@@ -196,8 +196,8 @@ def rates():
 
     rates_list = [
                     'tlt weekly5y', 
-                    # 'gld weekly5y', 
-                    # 'vug_to_vtv',   
+                    'gld weekly5y', 
+                    'vug_to_vtv',   
                     # 'spy_to_iwm',
                     # 'spy_to_xle',
                     # 'spy_to_kre', 
@@ -226,14 +226,13 @@ def rates():
         for item in result:
             dict1 = {}
             dict1['x'] = item['date']
-            # dict1['x'] = 10
             dict1['y'] = item['price']
             data_list.append(dict1) 
 
-        data_list = data_list[275:]
+        # data_list = data_list[-100:]
 
         print(name, len(data_list))
-        pprint.pprint(data_list)    
+        # pprint.pprint(data_list)    
 
         return data_list
         # data_dict = {
@@ -241,15 +240,18 @@ def rates():
         #     'data': data_list
         # }
 
-    # final_result_list = []
-    # for table in db_dataset.tables:
-    #     # print(table)
-    #     for i in range(len(rates_list)):
-    #         if str(table) == rates_list[i]:
-    #             name = rates_list[i]
-    #             react_vis_wrapper(name=name)
+    final_result_list = []
+    for table in db_dataset.tables:
+        print(table)
+        for i in range(len(rates_list)):
+            if str(table) == rates_list[i]:
+                name = rates_list[i]
+                data_list = react_vis_wrapper(name=name)
+                final_result_list.append(data_list)
 
-    final_result_list = react_vis_wrapper(name=rates_list[0])
+    # final_result_list = react_vis_wrapper(name=rates_list[0])
+    # for item in final_result_list:
+        # pprint.pprint(item)
 
     
     return jsonify(final_result_list)

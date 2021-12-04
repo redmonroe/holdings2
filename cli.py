@@ -459,11 +459,11 @@ def rates():
         rel_date = df1['date']
         for price, date in zip(rel_price, rel_date):
             tablename = db_set[series_name]
-            print(tablename, 'price:', price * adjustment_factor, 'date:', date.date())
+            print(tablename, 'price:', price * adjustment_factor, 'date:', date)
             tablename.insert(dict(name=str(series_name), price=str(round(price * adjustment_factor, 2)), date=str(date)))
 
-    # rates_list = ['spy', 'gld', 'tlt', 'vug', 'vtv', 'iwm', 'xle', 'kre']
-    rates_list = ['tlt']
+    rates_list = ['spy', 'gld', 'tlt', 'vug', 'vtv', 'iwm', 'xle', 'kre']
+    # rates_list = ['tlt', 'gld', 'vug', 'vtv']
 
     db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
     # drop_rates_tables()
@@ -482,10 +482,10 @@ def rates():
     '''relatives'''
 
     '''vug: vtv relative'''
-    # build_relative(rates_list, table1='vug weekly5y', table2='vtv weekly5y', series_name='vug_to_vtv', adjustment_factor=100)
+    # build_relative(rates_list, table1='vug weekly5y', table2='vtv weekly5y', series_name='vug_to_vtv', adjustment_factor=10)
 
     '''spy: iwm'''
-    # build_relative(rates_list, table1='spy weekly5y', table2='iwm weekly5y', series_name='spy_to_iwm', adjustment_factor=100)
+    build_relative(rates_list, table1='spy weekly5y', table2='iwm weekly5y', series_name='spy_to_iwm', adjustment_factor=100)
     
     '''spy: xle'''
     # build_relative(rates_list, table1='spy weekly5y', table2='xle weekly5y', series_name='spy_to_xle', adjustment_factor=50)

@@ -413,31 +413,54 @@ def topdown_explore():
 
     topdown_presenter(result_list=comparison_list)
 
-    '''key levels'''
+'''key levels'''
 
-    indices = [
-            "spx", 
-            "dia",
-            "qqq",
-            "iyt", 
-            "mdy", 
-            "iwm", 
-            "iwc",
-            "rsp",
-            "soxx", 
-            ]
+@cli.command()
+def indices():
+    db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
 
-    for item in indices:
-            t_name = item + ' ' + 'weekly5y'
+    index_table_list = [
+            "spy_index_scan" 
+            "dia_index_scan" 
+            "qqq_index_scan" 
+            "iyt_index_scan" 
+            "mdy_index_scan" 
+            "iwm_index_scan" 
+            "iwc_index_scan" 
+            "rsp_index_scan" 
+            "soxx_index_scan"
+    ]
+
+    for item in index_table_list:
+        table = db_set[item]
+        table.drop()
+
+
+    indices_dict = {
+            "spy": 454, 
+            "dia": 354, 
+            "qqq": 370, 
+            "iyt": 280, 
+            "mdy": 500, 
+            "iwm": 234, 
+            "iwc": 155, 
+            "rsp": 152, 
+            "soxx": 474, 
+    }
+
+    for name, kl in indices_dict.items():
+            t_name = name + '_' + 'index_scan'
             tablename = db_set[t_name]
-            price_series = yf.download(item, period='5y', interval='1wk')
+            price_series = yf.download(name, period='1wk', interval='1wk')
             price_series = price_series.fillna(method='pad')  ## deals with nans ok
             current_price =   price_series['Close']
-            # for item1 in current_price.iteritems():
-            #     print(item, 'price:', round(item1[1], 2), 'date:', item1[0].date())
-            #     tablename.insert(dict(name=item, price=round(item1[1], 2), date=str(item1[0].date())))
-
-
+            today_price = current_price.values[2]
+            if today_price >= kl:
+                risk = True
+            else:
+                risk = False
+            print(name, today_price, kl, risk)
+            # tablename.insert(dict(name=name, price=round(today_price, 2), key_level=kl, risk=risk))
 
 '''rates & leadership board funcs'''
 

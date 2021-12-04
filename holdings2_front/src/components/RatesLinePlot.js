@@ -14,9 +14,6 @@ import {
 function RatesLinePlot() {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState();
-  // const [useCanvas, setUseCanvas] = useState(true);
-  // const content = useCanvas ? "TOGGLE TO SVG" : "TOGGLE TO CANVAS";
-  // const Line = useCanvas ? LineSeriesCanvas : LineSeries;
 
   useEffect(() => {
     setIsLoading(true);

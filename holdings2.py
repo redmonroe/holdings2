@@ -184,15 +184,37 @@ def backup():
 
     return jsonify(str(bu_time))
 
+@app.get('/indices')
+def indices():
+    db_dataset = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
+
+    index_table_list = [
+        "spy_index_scan",  
+        "dia_index_scan", 
+        "qqq_index_scan", 
+        "iyt_index_scan", 
+        "mdy_index_scan", 
+        "iwm_index_scan", 
+        "iwc_index_scan", 
+        "rsp_index_scan", 
+        "soxx_index_scan",
+        ]   
+
+    list_for_return = []
+    for table in index_table_list:
+        result = db_dataset[table].all()
+        for item in result:
+            list_for_return.append(item)
+            print(item)
+    
+    return({'data' : list_for_return})
+
+
+
 @app.get('/rates')
 def rates():
     import pprint
     db_dataset = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
-
-    '''react-vis'''
-    '''
-    [{x: 1, y: 3}, {x: 2, y: 5}, {x: 3, y: 15}, {x: 4, y: 12}]
-    '''
 
     rates_list = [
                     'tlt weekly5y', 

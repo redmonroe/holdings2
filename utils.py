@@ -15,11 +15,11 @@ def pg_dump_one():
 def pg_restore_one(infile, testing=True):
     import subprocess
 
-    DB_NAME = 'numeral5'  # your db name
+    DB_NAME = '********'  # your db name
 
-    DB_USER = 'postgres' # you db user
+    DB_USER = '********' # you db user
     DB_HOST = "localhost"
-    DB_PASSWORD = 'redmonroe'# your db password
+    DB_PASSWORD = '******'# your db password
     dump_success = 1
     print ('Backing up %s database ' % (DB_NAME))
     command_for_dumping = f'pg_dump --host={DB_HOST} ' \
@@ -48,7 +48,7 @@ def pg_restore_one(infile, testing=True):
     restore process will #create tables with data.
     """
 
-    backup_file = '/home/Downloads/BlogTemplate/BlogTemplate/backup.dmp' 
+    backup_file = '/home/Downloads/BlogTemplate/BlogTemplate/backup.dmp' #example: edit before use
     """give absolute path of your dump file. This script will create the backup.dmp in the same directory from which u are running the script """
 
 

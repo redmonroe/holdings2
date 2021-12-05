@@ -201,13 +201,18 @@ def indices():
         ]   
 
     list_for_return = []
+    score_list = []
     for table in index_table_list:
         result = db_dataset[table].all()
         for item in result:
             list_for_return.append(item)
-            print(item)
+            if item['risk'] == True:
+                score_list.append(item)
+                print(item, item['risk'])
+
+    score = round(len(score_list)/len(index_table_list), 2)
     
-    return({'data' : list_for_return})
+    return({'data' : list_for_return, 'score': score})
 
 
 

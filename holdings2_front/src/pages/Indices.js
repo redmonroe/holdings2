@@ -37,8 +37,9 @@ function Indices() {
 
   return (
     <div>
-      <h1>sup bitch</h1>
+      <h1>indices</h1>
       <ul>{dataArray}</ul>
+      <p>score: {data["score"]}</p>
     </div>
   );
 }

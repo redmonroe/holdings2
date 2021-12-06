@@ -124,7 +124,7 @@ def price_updater(filename=None):
     db.session.close()
 
 '''rates helpers'''
-def rates_build_relative(rates_list, table1=None, table2=None, series_name=None, adjustment_factor=None):
+def rates_build_relative(rates_list, db_set=None, production=None, table1=None, table2=None, series_name=None, adjustment_factor=None):
     for item in rates_list:
         t_name = item + ' ' + 'weekly5y'
         if t_name == table1:
@@ -141,7 +141,7 @@ def rates_build_relative(rates_list, table1=None, table2=None, series_name=None,
     for price, date in zip(rel_price, rel_date):
         tablename = db_set[series_name]
         print(tablename, 'price:', price * adjustment_factor, 'date:', date)
-        tablename.insert(dict(name=str(series_name), price=str(round(price * adjustment_factor, 2)), date=str(date)))
+        # tablename.insert(dict(name=str(series_name), price=str(round(price * adjustment_factor, 2)), date=str(date)))
 
 def rates_define_df_index(list1=None):
     '''index prices series to date'''
@@ -605,16 +605,26 @@ def rates(production):
         df_list.append(df)
         
     '''merge absolutes based on 'date' index'''
-    df = reduce(lambda df1,df2: pd.merge(df1,df2,on='date', suffixes=('', '_')), df_list)
+    df = reduce(lambda df1, df2: pd.merge(df1, df2, on='date'), df_list)
 
-    print(df.head(10))
+    # rename cols in dataframe
+    partial_col_names = []
+    for i in range(len(rates_list)):
+        partial_col_names.append('price')
+    
+    new_col_names_list = []
+    for name, string in zip(rates_list, partial_col_names):
+        new_col_names_list.append(name)
+        new_col_names_list.append(string)
 
+    df.columns = new_col_names_list
 
-   
-
-    '''relatives'''
+    print(df.head(3))   
+    # print(df.tail(10))   
 
     '''vug: vtv relative'''
+    # rates_build_relative(rates_list, db_set=db_set, production=None, table1=None, table2=None, series_name=None, adjustment_factor=None)
+
     # rates_build_relative(rates_list, table1='vug weekly5y', table2='vtv weekly5y', series_name='vug_to_vtv', adjustment_factor=10)
 
     '''spy: iwm'''

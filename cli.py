@@ -525,7 +525,16 @@ def show_rates_tables():
         print(item)
 
 @cli.command()
-def rates():
+@click.option('-p', 'production')
+def rates(production):
+
+    #set up environment
+    if production == None:
+        click.echo(f'running rates testing') #default
+    else:
+        click.echo(f'running rates in production')
+        production = True
+
 
     def build_relative(rates_list, table1=None, table2=None, series_name=None, adjustment_factor=None):
         for item in rates_list:
@@ -546,8 +555,17 @@ def rates():
             print(tablename, 'price:', price * adjustment_factor, 'date:', date)
             tablename.insert(dict(name=str(series_name), price=str(round(price * adjustment_factor, 2)), date=str(date)))
 
-    rates_list = ['spy', 'gld', 'tlt', 'vug', 'vtv', 'iwm', 'xle', 'kre']
-    # rates_list = ['tlt', 'gld', 'vug', 'vtv']
+    if production:
+        rates_list = ['spy', 'gld', 'tlt', 'vug', 'vtv', 'iwm', 'xle', 'kre']
+    else:
+        rates_list = [
+            'spy', 
+            # 'tlt', 
+            # 'gld', 
+            # 'vug', 
+            # 'vtv'
+            ]
+
 
     db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
     # drop_rates_tables()
@@ -556,12 +574,20 @@ def rates():
     for item in rates_list:
         t_name = item + ' ' + 'weekly5y'
         tablename = db_set[t_name]
-        price_series = yf.download(item, period='5y', interval='1wk')
+        if production:
+            price_series = yf.download(item, period='5y', interval='1wk')
+        else:
+            price_series = yf.download(item, period='1y', interval='1wk')
         price_series = price_series.fillna(method='pad')  ## deals with nans ok
         current_price =   price_series['Close']
         for item1 in current_price.iteritems():
-            print(item, 'price:', round(item1[1], 2), 'date:', item1[0].date())
-            tablename.insert(dict(name=item, price=round(item1[1], 2), date=str(item1[0].date())))
+            if production:
+                tablename.insert(dict(name=item, price=round(item1[1], 2), date=str(item1[0].date())))
+            else:
+                print('testing mode: no db commit', item, 'price:', round(item1[1], 2), 'date:', item1[0].date())
+
+    '''index prices series to date'''
+
 
     '''relatives'''
 
@@ -569,7 +595,8 @@ def rates():
     # build_relative(rates_list, table1='vug weekly5y', table2='vtv weekly5y', series_name='vug_to_vtv', adjustment_factor=10)
 
     '''spy: iwm'''
-    build_relative(rates_list, table1='spy weekly5y', table2='iwm weekly5y', series_name='spy_to_iwm', adjustment_factor=100)
+    '''this one has nan problems why???'''
+    # build_relative(rates_list, table1='spy weekly5y', table2='iwm weekly5y', series_name='spy_to_iwm', adjustment_factor=100)
     
     '''spy: xle'''
     # build_relative(rates_list, table1='spy weekly5y', table2='xle weekly5y', series_name='spy_to_xle', adjustment_factor=50)
@@ -577,6 +604,71 @@ def rates():
     '''spy: kre'''
     # build_relative(rates_list, table1='spy weekly5y', table2='kre weekly5y', series_name='spy_to_kre', adjustment_factor=50)
         
+@cli.command()
+def rates_api():
+    import pprint
+    db_dataset = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
+
+    rates_list = [
+                    # 'tlt weekly5y', 
+                    # 'gld weekly5y', 
+                    # 'vug_to_vtv',   
+                    'spy_to_iwm',
+                    # 'spy_to_xle',
+                    # 'spy_to_kre', 
+                    # 'spy weekly5y'
+                    ]
+
+    # rates_list = ['tlt weekly5y']
+    # rates_list = ['gld weekly5y']
+
+    print(rates_list)
+
+    def recharts_rates_wrapper(name=None):
+        result = db_dataset[name].all()
+
+        data_list = []
+        for item in result:
+          data_list.append(item) 
+
+        # pprint.pprint(data_dict)    
+
+        final_result_list.append(data_dict)
+
+    def react_vis_wrapper(name=None):
+        result = db_dataset[name].all()
+        data_list = []
+        for item in result:
+            dict1 = {}
+            dict1['x'] = item['date']
+            dict1['y'] = item['price']
+            data_list.append(dict1) 
+
+        # data_list = data_list[-100:]
+
+        print(name, len(data_list))
+        # pprint.pprint(data_list)    
+
+        return data_list
+        # data_dict = {
+        #     'name': name, 
+        #     'data': data_list
+        # }
+
+    final_result_list = []
+    for table in db_dataset.tables:
+        print(table)
+        for i in range(len(rates_list)):
+            if str(table) == rates_list[i]:
+                name = rates_list[i]
+                data_list = react_vis_wrapper(name=name)
+                final_result_list.append(data_list)
+
+    final_result_list = react_vis_wrapper(name=rates_list[0])
+    for item in final_result_list:
+        pprint.pprint(item)
+
+
 
 @cli.command()
 @timer

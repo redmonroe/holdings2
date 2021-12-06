@@ -560,7 +560,7 @@ def rates(production):
     else:
         rates_list = [
             'spy', 
-            # 'tlt', 
+            'tlt', 
             # 'gld', 
             # 'vug', 
             # 'vtv'
@@ -569,9 +569,19 @@ def rates(production):
 
     db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
     # drop_rates_tables()
-     
+    def define_index(list1=None):
+        price_df = pd.DataFrame.from_dict(list1)
+
+        #convert date columns to pd datetime
+        price_df['date'] = price_df['date'].astype('datetime64[ns]')
+
+        #set date as index
+        price_df = price_df.set_index('date')
+
+        return price_df
+
     '''get prices and set prices into dataset db'''
-    test_list = []
+    df_list = []
     for item in rates_list:
         t_name = item + ' ' + 'weekly5y'
         tablename = db_set[t_name]
@@ -581,6 +591,7 @@ def rates(production):
             price_series = yf.download(item, period='1y', interval='1wk')
         price_series = price_series.fillna(method='pad')  ## deals with nans ok
         current_price =   price_series['Close']
+        test_list = []
         for item1 in current_price.iteritems():
             if production:
                 tablename.insert(dict(name=item, price=round(item1[1], 2), date=str(item1[0].date())))
@@ -592,22 +603,19 @@ def rates(production):
                 dict1['price'] = price=round(item1[1], 2)
                 dict1['date'] = date=str(item1[0].date())
                 test_list.append(dict1)
+                # continue
+         
+        df = define_index(list1=test_list)
+        df_list.append(df)
+        print(df.head(3))
+    
 
+    print(len(df_list))
     '''index prices series to date'''
-    def define_index(list1=None):
-        price_df = pd.DataFrame.from_dict(list1)
+   
 
-        #convert date columns to pd datetime
-        price_df['date'] = price_df['date'].astype('datetime64[ns]')
 
-        #set date as index
-        price_df = price_df.set_index('date')
-        
-        print(price_df.head(3))
-        print(price_df.tail(3))
-        print(price_df.index)
-
-    define_index(list1=test_list)
+    # df = define_index(list1=test_list)
 
 
     '''relatives'''

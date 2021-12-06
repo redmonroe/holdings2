@@ -123,6 +123,37 @@ def price_updater(filename=None):
 
     db.session.close()
 
+'''rates helpers'''
+def rates_build_relative(rates_list, table1=None, table2=None, series_name=None, adjustment_factor=None):
+    for item in rates_list:
+        t_name = item + ' ' + 'weekly5y'
+        if t_name == table1:
+            data = db_set[t_name].all()
+            df1 = pd.DataFrame.from_dict(data)
+            df1 = df1.fillna(method='pad')
+        if t_name == table2:
+            data = db_set[t_name].all()
+            df2 = pd.DataFrame.from_dict(data)
+            df2 = df2.fillna(method='pad')
+
+    rel_price = df1['price']/df2['price']
+    rel_date = df1['date']
+    for price, date in zip(rel_price, rel_date):
+        tablename = db_set[series_name]
+        print(tablename, 'price:', price * adjustment_factor, 'date:', date)
+        tablename.insert(dict(name=str(series_name), price=str(round(price * adjustment_factor, 2)), date=str(date)))
+
+def rates_define_df_index(list1=None):
+    '''index prices series to date'''
+    price_df = pd.DataFrame.from_dict(list1)
+    #convert date columns to pd datetime
+    price_df['date'] = price_df['date'].astype('datetime64[ns]')
+    #set date as index
+    price_df = price_df.set_index('date')
+
+    return price_df
+
+
 @click.group()
 def cli():
     pass
@@ -527,37 +558,11 @@ def show_rates_tables():
 @cli.command()
 @click.option('-p', 'production')
 def rates(production):
+    from functools import reduce
 
     #set up environment
     if production == None:
         click.echo(f'running rates testing') #default
-    else:
-        click.echo(f'running rates in production')
-        production = True
-
-
-    def build_relative(rates_list, table1=None, table2=None, series_name=None, adjustment_factor=None):
-        for item in rates_list:
-            t_name = item + ' ' + 'weekly5y'
-            if t_name == table1:
-                data = db_set[t_name].all()
-                df1 = pd.DataFrame.from_dict(data)
-                df1 = df1.fillna(method='pad')
-            if t_name == table2:
-                data = db_set[t_name].all()
-                df2 = pd.DataFrame.from_dict(data)
-                df2 = df2.fillna(method='pad')
-
-        rel_price = df1['price']/df2['price']
-        rel_date = df1['date']
-        for price, date in zip(rel_price, rel_date):
-            tablename = db_set[series_name]
-            print(tablename, 'price:', price * adjustment_factor, 'date:', date)
-            tablename.insert(dict(name=str(series_name), price=str(round(price * adjustment_factor, 2)), date=str(date)))
-
-    if production:
-        rates_list = ['spy', 'gld', 'tlt', 'vug', 'vtv', 'iwm', 'xle', 'kre']
-    else:
         rates_list = [
             'spy', 
             'tlt', 
@@ -565,20 +570,12 @@ def rates(production):
             'vug', 
             'vtv'
             ]
+    else:
+        click.echo(f'running rates in production')
+        rates_list = ['spy', 'gld', 'tlt', 'vug', 'vtv', 'iwm', 'xle', 'kre']
+        production = True
 
-
-    db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
-    # drop_rates_tables()
-
-    def define_index(list1=None):
-        '''index prices series to date'''
-        price_df = pd.DataFrame.from_dict(list1)
-        #convert date columns to pd datetime
-        price_df['date'] = price_df['date'].astype('datetime64[ns]')
-        #set date as index
-        price_df = price_df.set_index('date')
-
-        return price_df
+    db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS) 
 
     '''get prices and set prices into dataset db'''
     df_list = []
@@ -604,35 +601,31 @@ def rates(production):
                 dict1['date'] = date=str(item1[0].date())
                 test_list.append(dict1)
          
-        df = define_index(list1=test_list)
+        df = rates_define_df_index(list1=test_list)
         df_list.append(df)
-        print(df.head(3))
-
-    print(len(df_list))
-
-    from functools import reduce
+        
+    '''merge absolutes based on 'date' index'''
     df = reduce(lambda df1,df2: pd.merge(df1,df2,on='date', suffixes=('', '_')), df_list)
 
-    print(df.head(100))
+    print(df.head(10))
 
-    '''merge absolutes based on index'''
 
    
 
     '''relatives'''
 
     '''vug: vtv relative'''
-    # build_relative(rates_list, table1='vug weekly5y', table2='vtv weekly5y', series_name='vug_to_vtv', adjustment_factor=10)
+    # rates_build_relative(rates_list, table1='vug weekly5y', table2='vtv weekly5y', series_name='vug_to_vtv', adjustment_factor=10)
 
     '''spy: iwm'''
     '''this one has nan problems why???'''
-    # build_relative(rates_list, table1='spy weekly5y', table2='iwm weekly5y', series_name='spy_to_iwm', adjustment_factor=100)
+    # rates_build_relative(rates_list, table1='spy weekly5y', table2='iwm weekly5y', series_name='spy_to_iwm', adjustment_factor=100)
     
     '''spy: xle'''
-    # build_relative(rates_list, table1='spy weekly5y', table2='xle weekly5y', series_name='spy_to_xle', adjustment_factor=50)
+    # rates_build_relative(rates_list, table1='spy weekly5y', table2='xle weekly5y', series_name='spy_to_xle', adjustment_factor=50)
     
     '''spy: kre'''
-    # build_relative(rates_list, table1='spy weekly5y', table2='kre weekly5y', series_name='spy_to_kre', adjustment_factor=50)
+    # rates_build_relative(rates_list, table1='spy weekly5y', table2='kre weekly5y', series_name='spy_to_kre', adjustment_factor=50)
         
 @cli.command()
 def rates_api():

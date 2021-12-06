@@ -31,9 +31,12 @@ def str_to_list_helper(str):
     return list
 
     id_list = []
+
 def unpack_lod(list_of_dicts):
+    id_list = []
     tag_list = []
     for item in list_of_dicts:
+        print(item)
         for k, v in item.items():
             for it in v:
                 id_list.append(k)
@@ -55,6 +58,7 @@ def timer(func):
     return wrapper_timer
 
 def topdown_presenter(result_list=None):
+    print('tp?')
     result_list = sorted(result_list, key=lambda name: name[1])
     result_list.reverse()
     for count, item in enumerate(result_list, 1):
@@ -172,6 +176,16 @@ def drop_single_dataset_table_manual():
     table.drop()
 
 '''topdown funcs'''
+@cli.command()
+@click.option('-f', '--function_choice')
+def topdown_diagnose(function_choice):
+    click.echo(f'topdown diagnoses {function_choice}')
+
+    if function_choice == 'check_tree':
+        for item in Tree.query.all():
+            print(item)
+
+
 
 @cli.command()
 def topdown_drop_priceset():
@@ -204,10 +218,10 @@ def topdown_build_priceset():
                 price = round(price, 2)
                 date = price.index
                 for p, d in zip(price, date):
-                    print('hi', str(p), d)
+                    print(name, str(p), d)
                     table.insert(dict(name=name, date=d, price=p, tag=tag, sector=sector))
      
-    get_csv('spy', SPY_HOLDINGS_CSV, wait=1)
+    get_csv('spy', MASTER_ETF_AND_TAG_LIST, wait=1)
     
 @cli.command()
 def topdown_build():
@@ -219,18 +233,25 @@ def topdown_build():
 
     db.create_all()     
 
+
+    ## create list of themes ie stocks, bonds, crypto
     with open(MASTER_ETF_AND_TAG_LIST, encoding='utf-8') as csvf: 
             #load csv file data using csv library's dictionary reader
             csv_reader = csv.DictReader(csvf) 
             theme_list = []
             for row in itertools.islice(csv_reader, ROWS):
                 theme = row['TYPE']
-                print(theme)
+                print('theme', theme)
                 theme_list.append(theme)
 
     final_theme_list_from_csv = list(dict.fromkeys(theme_list))
-        
+    
     # build top-level themes_list from csv and persist to DB
+    # ie
+    # Tree(id=1, parent_id=None, data='stocks', children=[])
+    # Tree(id=2, parent_id=None, data='bonds', children=[])
+    # Tree(id=3, parent_id=None, data='crypto', children=[])
+
     for theme in final_theme_list_from_csv:
         tree = Tree()
         tree.parent_id = None
@@ -239,6 +260,9 @@ def topdown_build():
         db.session.commit()
     
     #build theme-tag group, assign tags to themes, persist to db
+    # ie
+    # Tree(id=4, parent_id=1, data='{risk_on,growth,smallcap,risk_off,us,ew,commodity,value}', children=[])
+    # Tree(id=5, parent_id=2, data='{us,risk_off}', children=[])
     with open(MASTER_ETF_AND_TAG_LIST, encoding='utf-8') as csvf: 
 
             csv_reader = csv.DictReader(csvf) 
@@ -282,9 +306,9 @@ def topdown_build():
                     db.session.add(tree2)
                     db.session.commit()
 
-    tags_list = []
 
     #build tag list from csv
+    tags_list = []
     with open(MASTER_ETF_AND_TAG_LIST, encoding='utf-8') as csvf: 
             #load csv file data using csv library's dictionary reader
             csv_reader = csv.DictReader(csvf) 
@@ -315,8 +339,11 @@ def topdown_build():
             subdict[id] = theme_list
             list_of_tags_by_theme.append(subdict)
 
-    id_list, t_list = unpack_lod(list_of_tags_by_theme)
+    for item in list_of_tags_by_theme:
+        print('tag list', item)
 
+    id_list, t_list = unpack_lod(list_of_tags_by_theme)
+   
     theme_etf_list = []
     for item in etf_master_list:
         for etf, tag1_list in item.items():
@@ -404,7 +431,7 @@ def topdown_explore():
 
     comparison_list = []
     for item in etf_choice_list:
-        # print(item, type(item))
+        print(item, type(item))
         ticker = LBName().query.filter_by(name=item).first()
         if ticker != None:
             # print(ticker.name, Decimal(ticker.gain_factor).quantize(Decimal('1.00')), Decimal(ticker.off_hi).quantize(Decimal('1.00')))

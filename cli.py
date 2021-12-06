@@ -185,6 +185,10 @@ def topdown_diagnose(function_choice):
         for item in Tree.query.all():
             print(item)
 
+    if function_choice == 'check_lb':
+        for item in LBName.query.all():
+            print(item)
+
 
 
 @cli.command()
@@ -207,9 +211,9 @@ def topdown_build_priceset():
             ticker_list = []
             for count, row in enumerate(itertools.islice(csv_reader, ROWS), 1):
                 time.sleep(wait)
-                name = row['Ticker']
+                name = row['name']
                 name = normalize_ticker(name)
-                sector = row['Sector']
+                # sector = row['Sector']
                 price = yf.download(name, period='1y', interval='1wk')
                 current_price = price['Close'].tail(1).item()
                 current_date = str(price.index[-1])
@@ -217,11 +221,17 @@ def topdown_build_priceset():
                 price = price['Close']
                 price = round(price, 2)
                 date = price.index
-                for p, d in zip(price, date):
-                    print(name, str(p), d)
-                    table.insert(dict(name=name, date=d, price=p, tag=tag, sector=sector))
+
+                lbname = LBName()
+                lbname.name = name
+
+
+                 # possible price history db implementation with dataset
+                # for p, d in zip(price, date):
+                    # print(name, str(p), d)
+                    # table.insert(dict(name=name, date=d, price=p, tag=tag, sector=sector))
      
-    get_csv('spy', MASTER_ETF_AND_TAG_LIST, wait=1)
+    get_csv('topdown', MASTER_ETF_AND_TAG_LIST, wait=1)
     
 @cli.command()
 def topdown_build():
@@ -232,7 +242,6 @@ def topdown_build():
         Tree.__table__.drop(db.engine)
 
     db.create_all()     
-
 
     ## create list of themes ie stocks, bonds, crypto
     with open(MASTER_ETF_AND_TAG_LIST, encoding='utf-8') as csvf: 

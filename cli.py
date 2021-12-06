@@ -571,6 +571,7 @@ def rates(production):
     # drop_rates_tables()
      
     '''get prices and set prices into dataset db'''
+    test_list = []
     for item in rates_list:
         t_name = item + ' ' + 'weekly5y'
         tablename = db_set[t_name]
@@ -584,9 +585,29 @@ def rates(production):
             if production:
                 tablename.insert(dict(name=item, price=round(item1[1], 2), date=str(item1[0].date())))
             else:
-                print('testing mode: no db commit', item, 'price:', round(item1[1], 2), 'date:', item1[0].date())
+                # print('testing mode: no db commit', item, 'price:', round(item1[1], 2), 'date:', item1[0].date())
+                # dict(name=item, price=round(item1[1], 2), date=str(item1[0].date()))
+                dict1 = {}
+                dict1['name'] = item
+                dict1['price'] = price=round(item1[1], 2)
+                dict1['date'] = date=str(item1[0].date())
+                test_list.append(dict1)
 
     '''index prices series to date'''
+    def define_index(list1=None):
+        price_df = pd.DataFrame.from_dict(list1)
+
+        #convert date columns to pd datetime
+        price_df['date'] = price_df['date'].astype('datetime64[ns]')
+
+        #set date as index
+        price_df = price_df.set_index('date')
+        
+        print(price_df.head(3))
+        print(price_df.tail(3))
+        print(price_df.index)
+
+    define_index(list1=test_list)
 
 
     '''relatives'''

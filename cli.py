@@ -619,10 +619,14 @@ def rates(production):
 
     df.columns = new_col_names_list
 
-    print(df.head(3))   
     # print(df.tail(10))   
 
     '''vug: vtv relative'''
+    df['v_price'] = df['vug']/df['vtv']
+    
+
+
+    print(df.head(3))  
     # rates_build_relative(rates_list, db_set=db_set, production=None, table1=None, table2=None, series_name=None, adjustment_factor=None)
 
     # rates_build_relative(rates_list, table1='vug weekly5y', table2='vtv weekly5y', series_name='vug_to_vtv', adjustment_factor=10)

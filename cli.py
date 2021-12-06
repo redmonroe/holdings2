@@ -556,6 +556,7 @@ def show_rates_tables():
         print(item)
 
 @cli.command()
+@timer
 @click.option('-p', 'production')
 def rates(production):
     from functools import reduce
@@ -568,7 +569,10 @@ def rates(production):
             'tlt', 
             'gld', 
             'vug', 
-            'vtv'
+            'vtv', 
+            'iwm', 
+            'xle', 
+            'kre', 
             ]
     else:
         click.echo(f'running rates in production')
@@ -590,16 +594,16 @@ def rates(production):
         current_price =   price_series['Close']
         test_list = []
         for item1 in current_price.iteritems():
-            if production:
-                tablename.insert(dict(name=item, price=round(item1[1], 2), date=str(item1[0].date())))
-            else:
+            # if production:
+            #     tablename.insert(dict(name=item, price=round(item1[1], 2), date=str(item1[0].date())))
+            # else:
                 # print('testing mode: no db commit', item, 'price:', round(item1[1], 2), 'date:', item1[0].date())
                 # dict(name=item, price=round(item1[1], 2), date=str(item1[0].date()))
-                dict1 = {}
-                dict1['name'] = item
-                dict1['price'] = price=round(item1[1], 2)
-                dict1['date'] = date=str(item1[0].date())
-                test_list.append(dict1)
+            dict1 = {}
+            dict1['name'] = item
+            dict1['price'] = price=round(item1[1], 2)
+            dict1['date'] = date=str(item1[0].date())
+            test_list.append(dict1)
          
         df = rates_define_df_index(list1=test_list)
         df_list.append(df)
@@ -609,8 +613,8 @@ def rates(production):
 
     # rename cols in dataframe
     partial_col_names = []
-    for i in range(len(rates_list)):
-        partial_col_names.append('price')
+    for item in rates_list:
+        partial_col_names.append('price_' + item)
     
     new_col_names_list = []
     for name, string in zip(rates_list, partial_col_names):
@@ -618,28 +622,25 @@ def rates(production):
         new_col_names_list.append(string)
 
     df.columns = new_col_names_list
+  
+    def new_build_rel_price_series(series_name=None, col1=None, col2=None):
+        new_name_col_name = 'name_' + series_name
+        new_name_col_price = 'price_' + series_name
+        df[new_name_col_name] = series_name
+        df[new_name_col_price] = df[col1]/df[col2]
 
-    # print(df.tail(10))   
-
-    '''vug: vtv relative'''
-    df['v_price'] = df['vug']/df['vtv']
+    '''relatives'''
+    new_build_rel_price_series(series_name='vug_to_vtv', col1='price_vug', col2='price_vtv')
+    new_build_rel_price_series(series_name='spy_to_iwm', col1='price_spy', col2='price_iwm')
+    new_build_rel_price_series(series_name='spy_to_xle', col1='price_spy', col2='price_xle')
+    new_build_rel_price_series(series_name='spy_to_kre', col1='price_spy', col2='price_kre')
     
+    print(df.head(2))
 
-
-    print(df.head(3))  
-    # rates_build_relative(rates_list, db_set=db_set, production=None, table1=None, table2=None, series_name=None, adjustment_factor=None)
-
-    # rates_build_relative(rates_list, table1='vug weekly5y', table2='vtv weekly5y', series_name='vug_to_vtv', adjustment_factor=10)
-
-    '''spy: iwm'''
-    '''this one has nan problems why???'''
-    # rates_build_relative(rates_list, table1='spy weekly5y', table2='iwm weekly5y', series_name='spy_to_iwm', adjustment_factor=100)
+    # export to db
+    for item1 in df.iteritems():  
+        print(item1)
     
-    '''spy: xle'''
-    # rates_build_relative(rates_list, table1='spy weekly5y', table2='xle weekly5y', series_name='spy_to_xle', adjustment_factor=50)
-    
-    '''spy: kre'''
-    # rates_build_relative(rates_list, table1='spy weekly5y', table2='kre weekly5y', series_name='spy_to_kre', adjustment_factor=50)
         
 @cli.command()
 def rates_api():

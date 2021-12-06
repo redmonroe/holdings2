@@ -221,6 +221,8 @@ def rates():
     import pprint
     db_dataset = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
 
+
+    # this will need to be reworked
     rates_list = [
                     'tlt weekly5y', 
                     'gld weekly5y', 

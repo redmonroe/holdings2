@@ -561,20 +561,20 @@ def rates(production):
         rates_list = [
             'spy', 
             'tlt', 
-            # 'gld', 
-            # 'vug', 
-            # 'vtv'
+            'gld', 
+            'vug', 
+            'vtv'
             ]
 
 
     db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
     # drop_rates_tables()
-    def define_index(list1=None):
-        price_df = pd.DataFrame.from_dict(list1)
 
+    def define_index(list1=None):
+        '''index prices series to date'''
+        price_df = pd.DataFrame.from_dict(list1)
         #convert date columns to pd datetime
         price_df['date'] = price_df['date'].astype('datetime64[ns]')
-
         #set date as index
         price_df = price_df.set_index('date')
 
@@ -603,20 +603,21 @@ def rates(production):
                 dict1['price'] = price=round(item1[1], 2)
                 dict1['date'] = date=str(item1[0].date())
                 test_list.append(dict1)
-                # continue
          
         df = define_index(list1=test_list)
         df_list.append(df)
         print(df.head(3))
-    
 
     print(len(df_list))
-    '''index prices series to date'''
+
+    from functools import reduce
+    df = reduce(lambda df1,df2: pd.merge(df1,df2,on='date', suffixes=('', '_')), df_list)
+
+    print(df.head(100))
+
+    '''merge absolutes based on index'''
+
    
-
-
-    # df = define_index(list1=test_list)
-
 
     '''relatives'''
 

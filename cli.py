@@ -1,5 +1,7 @@
 from sqlalchemy import inspect
+from sqlalchemy import create_engine
 from datetime import date
+from functools import reduce
 import click
 import time
 import functools
@@ -124,25 +126,6 @@ def price_updater(filename=None):
     db.session.close()
 
 '''rates helpers'''
-def rates_build_relative(rates_list, db_set=None, production=None, table1=None, table2=None, series_name=None, adjustment_factor=None):
-    for item in rates_list:
-        t_name = item + ' ' + 'weekly5y'
-        if t_name == table1:
-            data = db_set[t_name].all()
-            df1 = pd.DataFrame.from_dict(data)
-            df1 = df1.fillna(method='pad')
-        if t_name == table2:
-            data = db_set[t_name].all()
-            df2 = pd.DataFrame.from_dict(data)
-            df2 = df2.fillna(method='pad')
-
-    rel_price = df1['price']/df2['price']
-    rel_date = df1['date']
-    for price, date in zip(rel_price, rel_date):
-        tablename = db_set[series_name]
-        print(tablename, 'price:', price * adjustment_factor, 'date:', date)
-        # tablename.insert(dict(name=str(series_name), price=str(round(price * adjustment_factor, 2)), date=str(date)))
-
 def rates_define_df_index(list1=None):
     '''index prices series to date'''
     price_df = pd.DataFrame.from_dict(list1)
@@ -533,25 +516,21 @@ def indices():
 
 @cli.command()
 def drop_rates_tables():
-    rates_list = ['spy', 'gld', 'tlt', 'vug', 'vtv', 'iwm', 'xle', 'kre']
-    relatives_list = ['vug_to_vtv', 'spy_to_iwm', 'spy_to_xle', 'spy_to_kre']
+    # rates_list = ['spy', 'gld', 'tlt', 'vug', 'vtv', 'iwm', 'xle', 'kre']
+    # relatives_list = ['vug_to_vtv', 'spy_to_iwm', 'spy_to_xle', 'spy_to_kre']
 
-    db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
+    db_set = dataset.connect(Config.RATES_INDEX)
     for item in db_set.tables:
-        print(item)
-
-    for item in relatives_list:
         table = db_set[item]
         table.drop()
-
-    for item in rates_list:
-        name = item + ' ' + 'weekly5y'
-        table = db_set[name]
-        table.drop()
+        print(item)
+    
+    click.echo('finished dropping all rates tables')
 
 @cli.command()
 def show_rates_tables():
-    db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
+    click.echo('showing all rates tables')
+    db_set = dataset.connect(Config.RATES_INDEX)
     for item in db_set.tables:
         print(item)
 
@@ -559,7 +538,6 @@ def show_rates_tables():
 @timer
 @click.option('-p', 'production')
 def rates(production):
-    from functools import reduce
 
     #set up environment
     if production == None:
@@ -579,7 +557,7 @@ def rates(production):
         rates_list = ['spy', 'gld', 'tlt', 'vug', 'vtv', 'iwm', 'xle', 'kre']
         production = True
 
-    db_set = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS) 
+    db_set = dataset.connect(Config.RATES_INDEX) 
 
     '''get prices and set prices into dataset db'''
     df_list = []
@@ -594,11 +572,6 @@ def rates(production):
         current_price =   price_series['Close']
         test_list = []
         for item1 in current_price.iteritems():
-            # if production:
-            #     tablename.insert(dict(name=item, price=round(item1[1], 2), date=str(item1[0].date())))
-            # else:
-                # print('testing mode: no db commit', item, 'price:', round(item1[1], 2), 'date:', item1[0].date())
-                # dict(name=item, price=round(item1[1], 2), date=str(item1[0].date()))
             dict1 = {}
             dict1['name'] = item
             dict1['price'] = price=round(item1[1], 2)
@@ -636,16 +609,19 @@ def rates(production):
     new_build_rel_price_series(series_name='spy_to_kre', col1='price_spy', col2='price_kre')
     
     print(df.head(2))
+ 
+    engine = create_engine(Config.RATES_INDEX)
+    df.to_sql('rates_table' + '_' + dt.now(), engine)
 
     # export to db
-    for item1 in df.iteritems():  
-        print(item1)
+    # for item1 in df.iteritems():  
+    #     print(item1)
     
         
 @cli.command()
 def rates_api():
     import pprint
-    db_dataset = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
+    db_dataset = dataset.connect(Config.RATES_INDEX)
 
     rates_list = [
                     # 'tlt weekly5y', 

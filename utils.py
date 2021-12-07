@@ -11,6 +11,7 @@ def pg_dump_one():
     print(bu_time)
     os.system(f'pg_dump --dbname={Config.PG_DUMPS_URI1} > "{Config.DB_BACKUPS}\holdings2_db_dump{bu_time.month}{bu_time.day}{bu_time.year}{bu_time.hour}.sql"')
     os.system(f'pg_dump --dbname={Config.PG_DUMPS_URI2} > "{Config.DB_BACKUPS}\holdings2_db_dump{bu_time.month}{bu_time.day}{bu_time.year}{bu_time.hour}.sql"')
+    os.system(f'pg_dump --dbname={Config.PG_DUMPS_URI3} > "{Config.DB_BACKUPS}\RATESDB_dump{bu_time.month}{bu_time.day}{bu_time.year}{bu_time.hour}.sql"')
 
 def pg_restore_one(infile, testing=True):
     import subprocess

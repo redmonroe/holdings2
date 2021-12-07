@@ -9,6 +9,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import yfinance as yf
 from config import Config
+import pandas as pd
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@localhost/postgres"
@@ -219,69 +220,57 @@ def indices():
 @app.get('/rates')
 def rates():
     import pprint
-    db_dataset = dataset.connect(Config.HOLDINDEX_URL_INDEX_OF_SCANS)
+    from sqlalchemy import create_engine
 
+    engine = create_engine(Config.RATES_INDEX)
 
-    # this will need to be reworked
-    rates_list = [
-                    'tlt weekly5y', 
-                    'gld weekly5y', 
-                    'vug_to_vtv',   
-                    # 'spy_to_iwm',
-                    # 'spy_to_xle',
-                    # 'spy_to_kre', 
-                    # 'spy weekly5y'
-                    ]
+    def parse_for_react_vis(item=None):
 
-    # rates_list = ['tlt weekly5y']
-    # rates_list = ['gld weekly5y']
+        price_list = df[item].to_list()
 
-    print(rates_list)
-
-    def recharts_rates_wrapper(name=None):
-        result = db_dataset[name].all()
-
-        data_list = []
-        for item in result:
-          data_list.append(item) 
-
-        # pprint.pprint(data_dict)    
-
-        final_result_list.append(data_dict)
-
-    def react_vis_wrapper(name=None):
-        result = db_dataset[name].all()
-        data_list = []
-        for item in result:
+        result_list = []
+        for i, price in zip(index_list, price_list):
             dict1 = {}
-            dict1['x'] = item['date']
-            dict1['y'] = item['price']
-            data_list.append(dict1) 
+            dict1['x'] = i
+            dict1['y'] = price
+            result_list.append(dict1)
 
-        # data_list = data_list[-100:]
+        return result_list
 
-        print(name, len(data_list))
-        # pprint.pprint(data_list)    
+    target_list = [
+                'date', 
+                # 'spy', 
+                # 'price_spy', 
+                # 'tlt', 
+                'price_tlt', 
+                # 'gld', 
+                'price_gld', 
+                # 'price_kre', 
+                # 'name_vug_to_vtv', 
+                'price_vug_to_vtv', 
+                # 'name_spy_to_iwm', 
+                'price_spy_to_iwm', 
+                # 'name_spy_to_xle', 
+                'price_spy_to_xle', 
+                # 'name_spy_to_kre', 
+                'price_spy_to_kre', 
+                ]
+               
 
-        return data_list
-        # data_dict = {
-        #     'name': name, 
-        #     'data': data_list
-        # }
+    df = pd.read_sql_query(f'select * from "rates_table"', con=engine)
+
+    index_list = df['date'].to_list()
+    index_list = [item.strftime("%m-%d-%Y") for item in index_list]
+    # pprint.pprint(index_list)
 
     final_result_list = []
-    for table in db_dataset.tables:
-        print(table)
-        for i in range(len(rates_list)):
-            if str(table) == rates_list[i]:
-                name = rates_list[i]
-                data_list = react_vis_wrapper(name=name)
-                final_result_list.append(data_list)
+    for item in target_list[1:8]:
+        dict2 = {}
+        result_list = parse_for_react_vis(item=item)
+        dict2[item] = result_list
+        final_result_list.append(dict2)
 
-    # final_result_list = react_vis_wrapper(name=rates_list[0])
-    # for item in final_result_list:
-        # pprint.pprint(item)
-
+    pprint.pprint(final_result_list[0:2])
     
     return jsonify(final_result_list)
 

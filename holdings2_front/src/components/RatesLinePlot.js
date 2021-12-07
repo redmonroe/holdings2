@@ -7,8 +7,6 @@ import {
   HorizontalGridLines,
   VerticalGridLines,
   LineMarkSeries,
-  LineSeries,
-  LineSeriesCanvas,
 } from "react-vis";
 
 function RatesLinePlot() {
@@ -22,7 +20,7 @@ function RatesLinePlot() {
       .then((result) => result.json())
       .then((data) => {
         setData(data);
-        console.log("rates.js:", data, typeof data);
+        console.log("rates.js:", data[4], typeof data);
       })
       .catch((err) => {
         console.log(err);
@@ -40,11 +38,20 @@ function RatesLinePlot() {
     );
   }
 
-  // function Transform() {
-
-  // }
-
-  // Transform();
+  //  [
+  //    {
+  //      x: Date.parse("05/05/2019"),
+  //      y: 0,
+  //    },
+  //    {
+  //      x: Date.parse("05/12/2019"),
+  //      y: 12,
+  //    },
+  //    {
+  //      x: Date.parse("05/13/2019"),
+  //      y: 16,
+  //    },
+  //  ];
 
   return (
     <div>
@@ -52,15 +59,7 @@ function RatesLinePlot() {
       <XYPlot width={500} height={500} xType='ordinal'>
         <LineMarkSeries
           className='first-series'
-          data={data[0]}
-          lineStyle={{ stroke: "#e0e0e0" }}
-          markStyle={{ stroke: "none" }}
-          strokeStyle='solid'
-          style={{ fill: "none" }}
-        />
-        <LineMarkSeries
-          className='second-series'
-          data={data[1]}
+          data={data[0]["price_tlt"]}
           lineStyle={{ stroke: "blue" }}
           markStyle={{ stroke: "none" }}
           strokeStyle='solid'
@@ -68,7 +67,39 @@ function RatesLinePlot() {
         />
         <LineMarkSeries
           className='third-series'
-          data={data[2]}
+          data={data[1]["price_gld"]}
+          lineStyle={{ stroke: "blue" }}
+          markStyle={{ stroke: "none" }}
+          strokeStyle='solid'
+          style={{ fill: "none" }}
+        />
+        <LineMarkSeries
+          className='fourth-series'
+          data={data[2]["price_vug_to_vtv"]}
+          lineStyle={{ stroke: "blue" }}
+          markStyle={{ stroke: "none" }}
+          strokeStyle='solid'
+          style={{ fill: "none" }}
+        />
+        <LineMarkSeries
+          className='fifth-series'
+          data={data[3]["price_spy_to_iwm"]}
+          lineStyle={{ stroke: "blue" }}
+          markStyle={{ stroke: "none" }}
+          strokeStyle='solid'
+          style={{ fill: "none" }}
+        />
+        <LineMarkSeries
+          className='sixth-series'
+          data={data[4]["price_spy_to_xle"]}
+          lineStyle={{ stroke: "blue" }}
+          markStyle={{ stroke: "none" }}
+          strokeStyle='solid'
+          style={{ fill: "none" }}
+        />
+        <LineMarkSeries
+          className='sixth-series'
+          data={data[5]["price_spy_to_kre"]}
           lineStyle={{ stroke: "blue" }}
           markStyle={{ stroke: "none" }}
           strokeStyle='solid'
@@ -92,7 +123,7 @@ function RatesLinePlot() {
           xPercent={0.06}
           yPercent={0.06}
           style={{
-            transform: "rotate(-90)",
+            transform: "rotate(90)",
             textAnchor: "end",
           }}
         />

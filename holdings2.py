@@ -239,20 +239,11 @@ def rates():
 
     target_list = [
                 'date', 
-                # 'spy', 
-                # 'price_spy', 
-                # 'tlt', 
                 'price_tlt', 
-                # 'gld', 
                 'price_gld', 
-                # 'price_kre', 
-                # 'name_vug_to_vtv', 
                 'price_vug_to_vtv', 
-                # 'name_spy_to_iwm', 
                 'price_spy_to_iwm', 
-                # 'name_spy_to_xle', 
                 'price_spy_to_xle', 
-                # 'name_spy_to_kre', 
                 'price_spy_to_kre', 
                 ]
                

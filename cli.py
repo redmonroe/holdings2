@@ -562,8 +562,6 @@ def rates(production):
     '''get prices and set prices into dataset db'''
     df_list = []
     for item in rates_list:
-        t_name = item + ' ' + 'weekly5y'
-        tablename = db_set[t_name]
         if production:
             price_series = yf.download(item, period='5y', interval='1wk')
         else:
@@ -617,6 +615,10 @@ def rates(production):
 def rates_api():
     click.echo('running practice rates api')
     import pprint
+    # import matplotlib.pyplot as plt
+    # import seaborn as sns
+    # sns.set(rc={'figure.figsize':(11, 4)})
+
     db_set = dataset.connect(Config.RATES_INDEX)
     engine = create_engine(Config.RATES_INDEX)
 
@@ -624,30 +626,31 @@ def rates_api():
                 'date', 
                 # 'spy', 
                 'price_spy', 
-                # 'tlt', 
                 'price_tlt', 
-                # 'gld', 
                 'price_gld', 
                 'price_kre', 
-                # 'name_vug_to_vtv', 
                 'price_vug_to_vtv', 
-                # 'name_spy_to_iwm', 
                 'price_spy_to_iwm', 
-                # 'name_spy_to_xle', 
                 'price_spy_to_xle', 
-                # 'name_spy_to_kre', 
                 'price_spy_to_kre', 
                 ]
                
 
     df = pd.read_sql_query(f'select * from "rates_table"', con=engine)
+ 
 
     index_list = df['date'].to_list()
     index_list = [item.strftime("%m-%d-%Y") for item in index_list]
     # pprint.pprint(index_list)
 
     price_list = df['price_spy'].to_list()
-    # pprint.pprint(price_list)
+    print(df.head(3))
+    # df['price_spy'].plot(linewidth=0.5)
+    # df.plot()
+    plt.show(block=True)
+
+
+    pprint.pprint(price_list)
 
     final_result_list = []
     for i, price in zip(index_list, price_list):
@@ -657,91 +660,6 @@ def rates_api():
         final_result_list.append(dict1)
 
     pprint.pprint(final_result_list)
-   
-   
-   
-    '''
-    index_list = []
-    price_list = []
-    for k, v in result_dict.items():
-        if k == 'date':
-            # index_list.append(dir(v[0]))
-            index_list.append(v[0].strftime("%m/%d/%Y"))
-        if k == 'price_spy':
-            price_list.append(v[0])
-
-    time_series_dict = dict(zip(index_list, price_list))
-    '''
-
-    # print(df.head(3))
-
-    #df to dict
-    # pprint.pprint(price_list[0])
-    # pprint.pprint(time_series_dict)
-    # for k, v in result_dict.items():
-    #     pprint.pprint(k, v)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    def recharts_rates_wrapper(name=None):
-        result = db_dataset[name].all()
-
-        data_list = []
-        for item in result:
-          data_list.append(item) 
-
-        # pprint.pprint(data_dict)    
-
-        final_result_list.append(data_dict)
-
-    def react_vis_wrapper(name=None):
-        result = db_dataset[name].all()
-        data_list = []
-        for item in result:
-            dict1 = {}
-            dict1['x'] = item['date']
-            dict1['y'] = item['price']
-            data_list.append(dict1) 
-
-        # data_list = data_list[-100:]
-
-
-        return data_list
-        # data_dict = {
-        #     'name': name, 
-        #     'data': data_list
-        # }
-
-    # final_result_list = []
-    # for table in db_dataset.tables:
-    #     print(table)
-    #     for i in range(len(rates_list)):
-    #         if str(table) == rates_list[i]:
-    #             name = rates_list[i]
-    #             data_list = react_vis_wrapper(name=name)
-    #             final_result_list.append(data_list)
-
-    # final_result_list = react_vis_wrapper(name=rates_list[0])
-    # for item in final_result_list:
-    #     pprint.pprint(item)
-
-
 
 @cli.command()
 @timer

@@ -56,11 +56,11 @@ function RatesLinePlot() {
   return (
     <div>
       <p>Rate-Sensitive</p>
-      <XYPlot width={500} height={500} xType='ordinal'>
+      <XYPlot width={1000} height={1000} xType='ordinal'>
         <LineMarkSeries
           className='first-series'
           data={data[0]["price_tlt"]}
-          lineStyle={{ stroke: "blue" }}
+          lineStyle={{ stroke: "orange" }}
           markStyle={{ stroke: "none" }}
           strokeStyle='solid'
           style={{ fill: "none" }}
@@ -68,7 +68,7 @@ function RatesLinePlot() {
         <LineMarkSeries
           className='third-series'
           data={data[1]["price_gld"]}
-          lineStyle={{ stroke: "blue" }}
+          lineStyle={{ stroke: "red" }}
           markStyle={{ stroke: "none" }}
           strokeStyle='solid'
           style={{ fill: "none" }}

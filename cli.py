@@ -514,17 +514,16 @@ def indices():
 
 '''rates & leadership board funcs'''
 
-@cli.command()
-def drop_rates_tables():
-    # rates_list = ['spy', 'gld', 'tlt', 'vug', 'vtv', 'iwm', 'xle', 'kre']
-    # relatives_list = ['vug_to_vtv', 'spy_to_iwm', 'spy_to_xle', 'spy_to_kre']
-
+def drop_rates_table_helper():
     db_set = dataset.connect(Config.RATES_INDEX)
     for item in db_set.tables:
         table = db_set[item]
         table.drop()
         print(item)
-    
+
+@cli.command()
+def drop_rates_tables():
+    drop_rates_table_helper()
     click.echo('finished dropping all rates tables')
 
 @cli.command()
@@ -594,17 +593,17 @@ def rates(production):
 
     df.columns = new_col_names_list
   
-    def new_build_rel_price_series(series_name=None, col1=None, col2=None):
+    def new_build_rel_price_series(series_name=None, col1=None, col2=None, adj_factor=1):
         new_name_col_name = 'name_' + series_name
         new_name_col_price = 'price_' + series_name
         df[new_name_col_name] = series_name
-        df[new_name_col_price] = df[col1]/df[col2]
+        df[new_name_col_price] = ((df[col1]/df[col2]) * adj_factor)
 
     '''relatives'''
-    new_build_rel_price_series(series_name='vug_to_vtv', col1='price_vug', col2='price_vtv')
-    new_build_rel_price_series(series_name='spy_to_iwm', col1='price_spy', col2='price_iwm')
-    new_build_rel_price_series(series_name='spy_to_xle', col1='price_spy', col2='price_xle')
-    new_build_rel_price_series(series_name='spy_to_kre', col1='price_spy', col2='price_kre')
+    new_build_rel_price_series(series_name='vug_to_vtv', col1='price_vug', col2='price_vtv', adj_factor=100)
+    new_build_rel_price_series(series_name='spy_to_iwm', col1='price_spy', col2='price_iwm', adj_factor=100)
+    new_build_rel_price_series(series_name='spy_to_xle', col1='price_spy', col2='price_xle', adj_factor=20)
+    new_build_rel_price_series(series_name='spy_to_kre', col1='price_spy', col2='price_kre', adj_factor=20)
     
     print(df.head(2))
  
@@ -615,10 +614,14 @@ def rates(production):
 def rates_api():
     click.echo('running practice rates api')
     import pprint
-    # import matplotlib.pyplot as plt
-    # import seaborn as sns
-    # sns.set(rc={'figure.figsize':(11, 4)})
-
+    import numpy as np
+    import matplotlib
+    import tkinter
+    matplotlib.use('tkagg', force=True)
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    sns.set(rc={'figure.figsize':(11, 4)})
+    print(plt.get_backend())
     db_set = dataset.connect(Config.RATES_INDEX)
     engine = create_engine(Config.RATES_INDEX)
 
@@ -635,22 +638,13 @@ def rates_api():
                 'price_spy_to_kre', 
                 ]
                
-
     df = pd.read_sql_query(f'select * from "rates_table"', con=engine)
  
-
     index_list = df['date'].to_list()
     index_list = [item.strftime("%m-%d-%Y") for item in index_list]
-    # pprint.pprint(index_list)
 
     price_list = df['price_spy'].to_list()
     print(df.head(3))
-    # df['price_spy'].plot(linewidth=0.5)
-    # df.plot()
-    plt.show(block=True)
-
-
-    pprint.pprint(price_list)
 
     final_result_list = []
     for i, price in zip(index_list, price_list):

@@ -7,7 +7,6 @@ import {
   CartesianGrid,
   Tooltip,
   LabelList,
-  ResponsiveContainer,
 } from "recharts";
 
 function ScatterPlot({ incoming_data }) {
@@ -61,8 +60,7 @@ function ScatterPlot({ incoming_data }) {
 
   return (
     <div>
-      <p>ScatterChart {incoming_data}</p>
-      {/* <ResponsiveContainer> */}
+      <p>ScatterChart</p>
       <ScatterChart width={3000} height={800} allowDataOverflow={true}>
         <CartesianGrid />
         <XAxis type='number' dataKey='x' domain={[1, 4]} />
@@ -72,7 +70,6 @@ function ScatterPlot({ incoming_data }) {
           <LabelList dataKey='z' position='bottom' />
         </Scatter>
       </ScatterChart>
-      {/* </ResponsiveContainer> */}
     </div>
   );
 }

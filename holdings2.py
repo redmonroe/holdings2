@@ -1,6 +1,6 @@
-from sqlalchemy import inspect
 from dataclasses import dataclass
-from sqlalchemy import inspect
+from sqlalchemy import inspect, create_engine
+import pprint
 from datetime import date
 import dataset
 import os
@@ -175,12 +175,13 @@ def wscan(name=None):
 @app.get('/backup')
 def backup():
     from datetime import datetime as dt
-    import os
     bu_time = dt.now()
     print(Config.PG_DUMPS_URI1, Config.DB_BACKUPS)
     print(Config.PG_DUMPS_URI2, Config.DB_BACKUPS)
+    print(Config.PG_DUMPS_URI2, Config.DB_BACKUPS)
     os.system(f'pg_dump --dbname={Config.PG_DUMPS_URI1} > "./db_backups/holdings2_index_of_scansdb_dump{bu_time.month}{bu_time.day}{bu_time.year}{bu_time.hour}.sql"')
     os.system(f'pg_dump --dbname={Config.PG_DUMPS_URI2} > "./db_backups/holdings2_maindb_dump{bu_time.month}{bu_time.day}{bu_time.year}{bu_time.hour}.sql"')
+    os.system(f'pg_dump --dbname={Config.PG_DUMPS_URI3} > "./db_backups/RATES_dump{bu_time.month}{bu_time.day}{bu_time.year}{bu_time.hour}.sql"')
     print(bu_time, 'dumping db to /db_backups')
 
     return jsonify(str(bu_time))
@@ -219,9 +220,6 @@ def indices():
 
 @app.get('/rates')
 def rates():
-    import pprint
-    from sqlalchemy import create_engine
-
     engine = create_engine(Config.RATES_INDEX)
 
     def parse_for_react_vis(item=None):
@@ -261,7 +259,7 @@ def rates():
         dict2[item] = result_list
         final_result_list.append(dict2)
 
-    pprint.pprint(final_result_list[0:2])
+    pprint.pprint(final_result_list[0:8])
     
     return jsonify(final_result_list)
 
